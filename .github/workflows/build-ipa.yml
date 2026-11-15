@@ -161,12 +161,13 @@ jobs:
             SYMROOT="$PWD/build-ios-release" \
             IPHONEOS_DEPLOYMENT_TARGET=16.0 \
             ISH_JIT_BUILD=enabled \
-            CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGN_IDENTITY="-" \
+            EXPANDED_CODE_SIGN_IDENTITY="-" \
             CODE_SIGN_ENTITLEMENTS="" \
-            EXPANDED_CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
+            DEVELOPMENT_TEAM="" \
             build 2>&1 | tee build.log | tail -n 60
 
       - name: Show the compile errors
@@ -206,6 +207,18 @@ jobs:
           shasum -a 256 "$NAME" | tee "$NAME.sha256"
           ls -lh "$NAME"
           echo "IPA_NAME=$NAME" >> "$GITHUB_ENV"
+
+      - name: Verify the bundle inside the IPA
+        run: |
+          APP="out/Payload/$APP_NAME.app"
+          test -f "$APP/Info.plist" || { echo "::error::Info.plist is missing from the app"; exit 1; }
+          BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist" 2>/dev/null || true)
+          echo "CFBundleIdentifier=$BID"
+          test -n "$BID" || { echo "::error::CFBundleIdentifier is empty"; exit 1; }
+          echo "--- signature"
+          codesign -dv "$APP" 2>&1 | head -6 || true
+          echo "--- top of the IPA"
+          unzip -l "$IPA_NAME" | head -12
 
       - name: Upload the IPA
         uses: actions/upload-artifact@v4
