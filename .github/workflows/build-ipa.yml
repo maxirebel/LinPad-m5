@@ -52,11 +52,34 @@ jobs:
     timeout-minutes: 180
 
     steps:
-      - name: Check out (submodules are build inputs)
+      - name: Check out
         uses: actions/checkout@v5
         with:
-          submodules: recursive
+          # The submodules are fetched by the next step at the upstream pins: this repo
+          # was re-created from an archive, so it has no gitlinks for checkout to follow.
+          submodules: false
           fetch-depth: 1
+
+      - name: Fetch the pinned submodule sources
+        run: |
+          fetch_at() {
+            dir=$1; url=$2; sha=$3
+            rm -rf "$dir"
+            mkdir -p "$dir"
+            git -C "$dir" init -q
+            git -C "$dir" remote add origin "$url"
+            if ! git -C "$dir" fetch -q --depth 1 origin "$sha"; then
+              echo "shallow fetch failed for $dir, falling back to a full fetch"
+              git -C "$dir" fetch -q origin
+            fi
+            git -C "$dir" checkout -q "$sha"
+            echo "$dir @ $(git -C "$dir" rev-parse --short HEAD), $(git -C "$dir" ls-files | wc -l) files"
+          }
+          # Pins from fspecii/LinPad main (deps/libarchive and deps/libapps gitlinks).
+          fetch_at deps/libarchive https://github.com/libarchive/libarchive fc6563f5130d8a7ee1fc27c0e55baef35119f26c
+          fetch_at deps/libapps https://github.com/ish-app/libapps b8cacae35e5b11d64bb736a053921c16ca7faf9e
+          ls deps/libarchive/libarchive/archive_write_set_format_raw.c
+          ls deps/libapps/hterm/bin/mkdist
 
       - name: Show the toolchain
         run: |
