@@ -101,7 +101,7 @@ jobs:
           if [ -f gpu/.ios-built ] && [ -f gpu/prefix-ios/lib/libvirglrenderer.a ]; then
             echo "using the cached GPU build"
           else
-            gpu/build-third-party.sh ios
+            gpu/build-third-party.sh ios 2>&1 | tee -a build.log
             touch gpu/.ios-built
           fi
           ls -la gpu/prefix-ios/lib
@@ -145,6 +145,14 @@ jobs:
             EXPANDED_CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             build 2>&1 | tee build.log | tail -n 60
+
+      - name: Show the compile errors
+        if: failure()
+        run: |
+          echo "--- lines with error:"
+          grep -n -m 40 "error:" build.log || echo "no error: lines in build.log"
+          echo "--- last 40 lines:"
+          tail -n 40 build.log
 
       - name: Check the app
         run: |
