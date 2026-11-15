@@ -161,13 +161,12 @@ jobs:
             SYMROOT="$PWD/build-ios-release" \
             IPHONEOS_DEPLOYMENT_TARGET=16.0 \
             ISH_JIT_BUILD=enabled \
+            CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=YES \
-            CODE_SIGN_IDENTITY="-" \
-            EXPANDED_CODE_SIGN_IDENTITY="-" \
+            CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
+            EXPANDED_CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
-            DEVELOPMENT_TEAM="" \
             build 2>&1 | tee build.log | tail -n 60
 
       - name: Show the compile errors
@@ -177,6 +176,24 @@ jobs:
           grep -n -m 40 "error:" build.log || echo "no error: lines in build.log"
           echo "--- last 40 lines:"
           tail -n 40 build.log
+
+      - name: Inspect the bundle and sign it ad hoc
+        run: |
+          APP="build-ios-release/Release-iphoneos/$APP_NAME.app"
+          echo "--- bundle contents"
+          ls -la "$APP" | head -30
+          echo "--- Info.plist"
+          plutil -p "$APP/Info.plist" | head -30 || echo "no Info.plist"
+          BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist" 2>/dev/null || true)
+          echo "CFBundleIdentifier='$BID'"
+          # Xcode 26 refuses ad hoc signing for the device SDK, but the codesign tool
+          # itself still does it, and a signature is what iOS wants at the staging step.
+          if codesign --force --sign - --timestamp=none "$APP"; then
+            echo "ad-hoc signed"
+          else
+            echo "::warning::codesign refused the ad-hoc signature"
+          fi
+          codesign -dv "$APP" 2>&1 | head -6 || true
 
       - name: Check the app
         run: |
