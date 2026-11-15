@@ -68,10 +68,20 @@ jobs:
 
       - name: Install build tools
         run: |
-          brew install llvm lld meson ninja libarchive
+          brew install llvm lld meson ninja libarchive pkg-config
           # llvm and lld are keg-only.
           echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
           echo "$(brew --prefix lld)/bin" >> "$GITHUB_PATH"
+          # gpu/build-third-party.sh needs Python's mako, and the runner's python3 is
+          # externally managed, so install it into a venv and put it on PYTHONPATH.
+          python3 -m venv "$RUNNER_TEMP/mako"
+          "$RUNNER_TEMP/mako/bin/pip" install --quiet --upgrade pip
+          "$RUNNER_TEMP/mako/bin/pip" install --quiet mako
+          SITE=$("$RUNNER_TEMP/mako/bin/python3" -c 'import site; print(site.getsitepackages()[0])')
+          echo "$RUNNER_TEMP/mako/bin" >> "$GITHUB_PATH"
+          echo "PYTHONPATH=$SITE" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/mako/bin/python3" -c 'import mako; print("mako", mako.__version__)'
+          pkg-config --version
 
       - name: Cache the GPU libraries
         id: gpu-cache

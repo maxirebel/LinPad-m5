@@ -94,15 +94,26 @@ pkg_config_libdir = '$P/lib/pkgconfig'
 
 [host_machine]
 system = 'darwin'
-$( [ $t = macos ] || echo "subsystem = 'ios'" )
+$( [ "$t" = macos ] || echo "subsystem = 'ios'" )
 cpu_family = 'aarch64'
 cpu = 'aarch64'
 endian = 'little'
 EOF
     local B=$GPU/build/virgl-$t
     rm -rf "$B"
-    meson setup "$B" "$SRC" --cross-file "$cross" --prefix="$P" "${VIRGL_OPTS[@]}" >/dev/null
-    ninja -C "$B" install >/dev/null
+    mkdir -p "$GPU/build"
+    # Keep the output: when this fails in CI, a silent redirect leaves nothing to read.
+    if ! meson setup "$B" "$SRC" --cross-file "$cross" --prefix="$P" "${VIRGL_OPTS[@]}" \
+            > "$GPU/build/meson-$t.log" 2>&1; then
+        echo "meson setup failed for $t:" >&2
+        tail -n 80 "$GPU/build/meson-$t.log" >&2
+        exit 1
+    fi
+    if ! ninja -C "$B" install > "$GPU/build/ninja-$t.log" 2>&1; then
+        echo "ninja failed for $t:" >&2
+        tail -n 80 "$GPU/build/ninja-$t.log" >&2
+        exit 1
+    fi
     echo "built $P ($(du -sh "$P/lib" | cut -f1))"
 }
 
