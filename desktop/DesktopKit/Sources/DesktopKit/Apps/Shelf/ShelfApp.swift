@@ -147,6 +147,10 @@ final class ShelfModel {
         log = ""
     }
 
+    func dismissError() {
+        errorMessage = nil
+    }
+
     /// "https://host/app_arm64.deb" -> "app"; "keepassxc" -> "keepassxc".
     private func guestName(for target: String) -> String {
         let base = target.split(separator: "/").last.map(String.init) ?? target
@@ -178,7 +182,7 @@ struct ShelfAppView: View {
             VStack(spacing: 0) {
                 toolbar
                 if let message = model.errorMessage {
-                    InlineBanner(kind: .error, message: message, onDismiss: { model.errorMessage = nil })
+                    InlineBanner(kind: .error, message: message, onDismiss: { model.dismissError() })
                 }
                 if model.isInstalling {
                     HStack(spacing: 8) {
