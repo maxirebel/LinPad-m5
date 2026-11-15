@@ -1,0 +1,187 @@
+# Builds an unsigned LinPad IPA on a GitHub-hosted Apple Silicon Mac.
+#
+# The result is NOT signed: install it with iloader / SideStore / Sideloadly, which sign
+# it with your own Apple ID at install time (7-day certificate on a free account).
+#
+# Why this exists: LinPad's emulator builds only on an aarch64 host (meson.build requires
+# an arm64 guest on an aarch64 host), so a Mac is mandatory. This workflow lends you
+# GitHub's macOS runner instead of owning one.
+#
+# Run it from the Actions tab (Run workflow), or push a v* tag. It downloads the official
+# rootfs asset of the release instead of rebuilding it (~50 min saved), builds the GPU
+# libraries once and caches them, then compiles the app.
+name: Build unsigned IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      rootfs_url:
+        description: Rootfs tarball to embed (the official release asset by default)
+        required: false
+        default: https://github.com/fspecii/LinPad/releases/download/v1.5.0/linpad-rootfs-1.5.0.tar.gz
+      rootfs_sha256:
+        description: SHA-256 of that tarball (empty to skip the check)
+        required: false
+        default: b5e852cfe2d9763863323895a6f94194ac980b226926a6f6a2a27c5f5e41ea9b
+      rootfs_version:
+        description: Value written to root.version inside the app
+        required: false
+        default: "1.5.0"
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ipa-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: "1"
+  APP_NAME: iSH ARM64
+
+jobs:
+  ipa:
+    name: Build the app and package an IPA
+    # Apple Silicon: the emulator needs an aarch64 host.
+    runs-on: macos-26
+    timeout-minutes: 180
+
+    steps:
+      - name: Check out (submodules are build inputs)
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Show the toolchain
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          uname -m
+          echo "--- schemes"
+          xcodebuild -list -project iSH.xcodeproj | sed -n '/Schemes:/,$p'
+
+      - name: Install build tools
+        run: |
+          brew install llvm lld meson ninja libarchive
+          # llvm and lld are keg-only.
+          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix lld)/bin" >> "$GITHUB_PATH"
+
+      - name: Cache the GPU libraries
+        id: gpu-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            gpu/downloads
+            gpu/third_party
+            gpu/prefix-ios
+            gpu/.ios-built
+          key: gpu-ios-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('gpu/build-third-party.sh', 'gpu/*.sh', 'gpu/patches/**') }}
+          restore-keys: |
+            gpu-ios-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Build virglrenderer and MoltenVK for the device
+        run: |
+          if [ -f gpu/.ios-built ] && [ -f gpu/prefix-ios/lib/libvirglrenderer.a ]; then
+            echo "using the cached GPU build"
+          else
+            gpu/build-third-party.sh ios
+            touch gpu/.ios-built
+          fi
+          ls -la gpu/prefix-ios/lib
+
+      - name: Cache the rootfs tarball
+        id: rootfs-cache
+        uses: actions/cache@v4
+        with:
+          path: release/out/rootfs.tar.gz
+          key: rootfs-${{ github.event.inputs.rootfs_sha256 || 'release-1.5.0' }}
+
+      - name: Fetch the rootfs that goes inside the app
+        env:
+          ROOTFS_URL: ${{ github.event.inputs.rootfs_url || 'https://github.com/fspecii/LinPad/releases/download/v1.5.0/linpad-rootfs-1.5.0.tar.gz' }}
+          ROOTFS_SHA: ${{ github.event.inputs.rootfs_sha256 || 'b5e852cfe2d9763863323895a6f94194ac980b226926a6f6a2a27c5f5e41ea9b' }}
+        run: |
+          mkdir -p release/out
+          if [ ! -s release/out/rootfs.tar.gz ]; then
+            echo "downloading $ROOTFS_URL"
+            curl -fL --retry 3 -o release/out/rootfs.tar.gz.part "$ROOTFS_URL"
+            mv release/out/rootfs.tar.gz.part release/out/rootfs.tar.gz
+          fi
+          if [ -n "$ROOTFS_SHA" ]; then
+            echo "$ROOTFS_SHA  release/out/rootfs.tar.gz" | shasum -a 256 -c -
+          fi
+          ls -lh release/out/rootfs.tar.gz
+
+      - name: Build the app (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild -skipMacroValidation \
+            -project iSH.xcodeproj -scheme iSH-ARM64 -configuration Release \
+            -destination generic/platform=iOS \
+            SYMROOT="$PWD/build-ios-release" \
+            IPHONEOS_DEPLOYMENT_TARGET=16.0 \
+            ISH_JIT_BUILD=enabled \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            EXPANDED_CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            build 2>&1 | tee build.log | tail -n 60
+
+      - name: Check the app
+        run: |
+          APP="build-ios-release/Release-iphoneos/$APP_NAME.app"
+          [ -d "$APP" ] || { echo "::error::the build produced no app at $APP"; exit 1; }
+          ls -lh "$APP/$APP_NAME"
+          echo "--- is the JIT compiled in?"
+          nm "$APP/$APP_NAME" | grep -c ish_jit_try_enable || true
+
+      - name: Put the rootfs inside the app
+        run: |
+          APP="build-ios-release/Release-iphoneos/$APP_NAME.app"
+          VERSION="${{ github.event.inputs.rootfs_version || '1.5.0' }}"
+          cp release/out/rootfs.tar.gz "$APP/root.tar.gz"
+          printf '%s\n' "$VERSION" > "$APP/root.version"
+          ls -lh "$APP/root.tar.gz" "$APP/root.version"
+          du -sh "$APP"
+
+      - name: Package the IPA
+        run: |
+          APP="build-ios-release/Release-iphoneos/$APP_NAME.app"
+          NAME="LinPad-$(printf '%s' "${{ github.event.inputs.rootfs_version || '1.5.0' }}")-unsigned.ipa"
+          rm -rf out "$NAME"
+          mkdir -p out/Payload
+          cp -R "$APP" out/Payload/
+          # No code signature on purpose: the sideloader signs it with your Apple ID.
+          (cd out && zip -qry "../$NAME" Payload)
+          shasum -a 256 "$NAME" | tee "$NAME.sha256"
+          ls -lh "$NAME"
+          echo "IPA_NAME=$NAME" >> "$GITHUB_ENV"
+
+      - name: Upload the IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinPad-unsigned-ipa
+          path: |
+            ${{ env.IPA_NAME }}
+            ${{ env.IPA_NAME }}.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Upload the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          if-no-files-found: ignore
+          retention-days: 7

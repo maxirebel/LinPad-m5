@@ -1,0 +1,82 @@
+#ifndef FS_FAKEFS_API_H
+#define FS_FAKEFS_API_H
+
+#include <sqlite3.h>
+#include "fs/fix_path.h"
+#include "misc.h"
+
+struct fakefs_db {
+    sqlite3 *db;
+    struct {
+        sqlite3_stmt *begin_deferred;
+        sqlite3_stmt *begin_immediate;
+        sqlite3_stmt *commit;
+        sqlite3_stmt *rollback;
+        sqlite3_stmt *path_get_inode;
+        sqlite3_stmt *path_read_stat;
+        sqlite3_stmt *path_create_stat;
+        sqlite3_stmt *path_create_path;
+        sqlite3_stmt *inode_read_stat;
+        sqlite3_stmt *inode_write_stat;
+        sqlite3_stmt *path_link;
+        sqlite3_stmt *path_unlink;
+        sqlite3_stmt *path_rename;
+        sqlite3_stmt *path_from_inode;
+        sqlite3_stmt *try_cleanup_inode;
+    } stmt;
+    sqlite3_mutex *lock;
+
+    // Cache of path_read_stat results, so path walks and stats don't run
+    // sqlite for every component (see fake-db.c).
+    struct stat_cache *stat_cache;
+    int wal_fd; // meta.db-wal: other processes' commits change its mtime/size
+    char *db_path;
+    _Atomic uint64_t write_gen; // bumped when this process changes the db
+    int64_t txn_changes; // sqlite3_total_changes64 at transaction start
+};
+
+int fake_db_init(struct fakefs_db *fs, const char *db_path, int root_fd);
+int fake_db_deinit(struct fakefs_db *fs);
+
+// Parking (see fake-db.c): closes the connection so no lock is held on the db files.
+// While parked, a connection reopened for a transaction is closed again at its end.
+void fake_db_set_parked(bool parked);
+bool fake_db_is_parked(void);
+void fake_db_park(struct fakefs_db *fs);
+bool fake_db_is_open(struct fakefs_db *fs);
+void fake_db_wait_while_parked(void);
+
+void db_begin_read(struct fakefs_db *fs);
+void db_begin_write(struct fakefs_db *fs);
+void db_commit(struct fakefs_db *fs);
+void db_rollback(struct fakefs_db *fs);
+
+bool db_exec(struct fakefs_db *fs, sqlite3_stmt *stmt);
+void db_reset(struct fakefs_db *fs, sqlite3_stmt *stmt);
+void db_exec_reset(struct fakefs_db *fs, sqlite3_stmt *stmt);
+
+struct ish_stat {
+    uint32_t mode;
+    uint32_t uid;
+    uint32_t gid;
+    uint32_t rdev;
+};
+
+typedef uint64_t inode_t;
+
+inode_t path_get_inode(struct fakefs_db *fs, const char *path);
+bool path_read_stat(struct fakefs_db *fs, const char *path, struct ish_stat *stat, uint64_t *inode);
+// path_read_stat from the cache, without a transaction: 1 if the path exists,
+// 0 if it doesn't, -1 if the cache can't tell
+int path_read_stat_cached(struct fakefs_db *fs, const char *path, struct ish_stat *stat, uint64_t *inode);
+inode_t path_create(struct fakefs_db *fs, const char *path, struct ish_stat *stat);
+
+bool inode_read_stat_if_exist(struct fakefs_db *fs, inode_t inode, struct ish_stat *stat);
+void inode_read_stat_or_die(struct fakefs_db *fs, inode_t inode, struct ish_stat *stat);
+void inode_write_stat(struct fakefs_db *fs, inode_t inode, struct ish_stat *stat);
+
+void path_link(struct fakefs_db *fs, const char *src, const char *dst);
+inode_t path_unlink(struct fakefs_db *fs, const char *path);
+void path_rename(struct fakefs_db *fs, const char *src, const char *dst);
+
+#endif

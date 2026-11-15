@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.user-fonts</key>
+	<array>
+		<string>app-usage</string>
+	</array>
+	<!-- LinPad M5: lets the emulator keep several GB of guest RAM instead of the
+	     default per-app jetsam ceiling. Requires a provisioning profile that includes
+	     this entitlement; remove the key if signing fails. -->
+	<key>com.apple.developer.kernel.increased-memory-limit</key>
+	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(PRODUCT_APP_GROUP_IDENTIFIER)</string>
+	</array>
+</dict>
+</plist>

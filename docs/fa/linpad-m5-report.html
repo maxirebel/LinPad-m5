@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinPad M5 — گزارش شخصی‌سازی و نصب نرم‌افزار</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --accent: #0a84ff; --code-bg: #f2f2ef; --table-head: #f6f6f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --fg: #e8e8ea; --muted: #a0a0a6; --line: #2c2c31;
+      --accent: #4da3ff; --code-bg: #1e1e23; --table-head: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 48px 24px 96px; max-width: 920px;
+    background: var(--bg); color: var(--fg);
+    font-family: Vazirmatn, "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
+    font-size: 17px; line-height: 1.95; text-align: right;
+  }
+  h1, h2, h3, h4 { line-height: 1.5; font-weight: 700; letter-spacing: -0.01em; }
+  h1 { font-size: 2rem; margin: 0 0 .4em; }
+  h2 {
+    font-size: 1.5rem; margin: 2.4em 0 .8em; padding-bottom: .35em;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 1.18rem; margin: 1.8em 0 .6em; }
+  h4 { font-size: 1.02rem; margin: 1.4em 0 .4em; color: var(--muted); }
+  p { margin: 0 0 1.05em; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: currentColor; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2.6em 0; }
+  blockquote {
+    margin: 1.6em 0; padding: 1em 1.2em; border-right: 4px solid var(--accent);
+    background: var(--code-bg); border-radius: 0 10px 10px 0; color: var(--muted);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  code, pre, kbd {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    direction: ltr; unicode-bidi: embed; text-align: left;
+  }
+  code { background: var(--code-bg); padding: .12em .35em; border-radius: 5px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); padding: 16px 18px; border-radius: 10px;
+    overflow-x: auto; line-height: 1.65; font-size: .86em; margin: 1.2em 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: .93em;
+    display: block; overflow-x: auto;
+  }
+  th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: right; vertical-align: top; }
+  th { background: var(--table-head); font-weight: 600; white-space: nowrap; }
+  tr:nth-child(even) td { background: color-mix(in srgb, var(--code-bg) 45%, transparent); }
+  ul, ol { margin: 0 0 1.1em; padding-inline-start: 1.6em; }
+  li { margin: .35em 0; }
+  strong { font-weight: 700; }
+  @media print {
+    body { max-width: none; padding: 0; font-size: 11.5pt; }
+    h2 { break-after: avoid; }
+    table, pre, blockquote { break-inside: avoid; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+<h1>LinPad روی iPad Pro M5 (۱۲ گیگابایت)</h1>
+<h2>بررسی، شخصی‌سازی و مسیر «نصب آسان هر نرم‌افزار لینوکسی»</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>نسخه بررسی‌شده</strong></td>
+<td>LinPad 1.5.0 (منتشرشده ۲۰۲۶-۱۰-۰۳) — <a href="https://github.com/fspecii/LinPad">github.com/fspecii/LinPad</a></td>
+</tr>
+<tr>
+<td><strong>تاریخ گزارش</strong></td>
+<td>۱۴ نوامبر ۲۰۲۶</td>
+</tr>
+<tr>
+<td><strong>هدف سخت‌افزاری</strong></td>
+<td>iPad Pro M5، مدل ۲۵۶ یا ۵۱۲ گیگابایت (۱۲ گیگابایت رم، CPU ۹ هسته‌ای، GPU ۱۰ هسته‌ای)</td>
+</tr>
+<tr>
+<td><strong>سیستم‌عامل</strong></td>
+<td>iPadOS 27.2</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>خلاصه اجرایی</h2>
+<p>۱. <strong>پروژه واقعی و جدی است، نه یک دموی تبلیغاتی.</strong> ۲٫۴۴۸ فایل، ۳۴ مگابایت سورس C/Objective-C/Swift، شبیه‌ساز syscall لینوکس با JIT بومی ARM64، یک کامپوزیتور Wayland داخل مهمان، و یک دسکتاپ SwiftUI. اعداد داخل مخزن با ادعاهای README هم‌خوان است (system image فشرده ۵۸۹ مبی‌بایت / ۲٫۲۴ گیگابایت بازشده / ۲۱۶٬۹۵۲ فایل).</p>
+<p>۲. <strong>روی M5 راحت‌تر از M3 کار می‌کند، اما نه به‌خاطر رم بیشتر به‌تنهایی.</strong> گلوگاه اصلی، «سقف حافظه هر اپ» در iPadOS (jetsam) است، نه سخت‌افزار. اپ به‌طور پیش‌فرض entitlement مربوط به افزایش سقف حافظه را ندارد؛ افزودن آن بزرگ‌ترین بردِ تک‌خطی این پروژه برای شماست.</p>
+<p>۳. <strong>مهم‌ترین مشکل پروژه دقیقاً همان چیزی است که شما گفته‌اید: توزیع نرم‌افزار.</strong> استور پروژه ۸۰۰ اپ دارد (۷۸۰ بسته apk + ۲۰ پک)، ولی فقط ۲۹ مورد «تست‌شده» برچسب خورده‌اند. هر چیزی که apk نباشد — <code>.deb</code>، AppImage، بسته‌های glibc، نرم‌افزارهای x86_64 — امروز مسیر نصب ندارد.</p>
+<p>۴. <strong>چهار دیوار واقعی وجود دارد که با هیچ ترفند نصبی برداشته نمی‌شوند:</strong> معماری (فقط aarch64)، libc (musl در برابر glibc)، نبود namespace و FUSE، و نبود systemd. Flatpak و Snap و Docker روی این معماری <strong>ممکن نیستند</strong>؛ نه اینکه سخت باشد — سازوکار هسته‌ای‌شان وجود ندارد.</p>
+<p>۵. <strong>بخش بزرگی از آنچه عملاً «نرم‌افزار لینوکسی aarch64» منتشر می‌شود، با سه قطعه نصب‌شدنی می‌شود:</strong> یک نصب‌کننده <code>.deb</code>، یک بازکننده AppImage بدون FUSE، و یک «جزیره glibc» عمومی. (تخمین من از پوشش: نیمی تا دوسوم اپ‌های دسکتاپ رایج؛ نه همه — دیوارهای بخش ۴ سر جای خود هستند.) هر سه در همین گزارش ساخته و تحویل داده شده‌اند (<code>personalize/linpad-get</code>) و <strong>بدون نیاز به build دوباره اپ</strong> روی نسخه ۱٫۵٫۰ کار می‌کنند.</p>
+<p>۶. <strong>برای بهینه‌سازی M5/۱۲GB سه لایه وجود دارد:</strong> تنظیمات بدون بیلد (اسکریپت <code>m5-tune.sh</code>)، یک پچ کوچک روی اپ (<code>personalize/app-m5.patch</code> — همان اعمال شده)، و بازسازی system image روی Alpine 3.24 (نیازمند مک).</p>
+<p>۷. <strong>یک هشدار فوری:</strong> system image پروژه روی <strong>Alpine 3.21</strong> است و این شاخه در <strong>۱ نوامبر ۲۰۲۶ EOL شد</strong>. یعنی از دو هفته پیش هیچ وصله امنیتی برای مهمان منتشر نمی‌شود. مهاجرت به 3.23/3.24 یک بهینه‌سازی لوکس نیست؛ یک مسئله امنیتی است.</p>
+<p>۸. <strong>محدودیت‌های نصب اپ روی آیپد را جدی بگیرید:</strong> با Apple ID رایگان، هر اپ بعد از ۷ روز منقضی می‌شود و هم‌زمان فقط ۳ اپ نصب می‌ماند؛ StikDebug و LocalDevVPN هم خودشان اپ سایدلودشده‌اند و همین قاعده را دارند. JIT هم بدون StikDebug روشن نمی‌شود.</p>
+<hr>
+<h2>۱. این پروژه چیست و چقدر از ادعاهایش واقعی است</h2>
+<h3>۱.۱ معماری در یک نگاه</h3>
+<p>LinPad یک ماشین مجازی نیست و jailbreak نمی‌خواهد؛ <strong>یک پروسه iOS</strong> است که پنج لایه دارد:</p>
+<table>
+<thead>
+<tr>
+<th>لایه</th>
+<th>چیست</th>
+<th>جایی که باید نگاه کنید</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>شبیه‌ساز</td>
+<td>fork از iSH / iSH-ARM64: فراخوان‌های سیستمی لینوکس را به iOS ترجمه می‌کند و کد ARM64 مهمان را با JIT بومی اجرا می‌کند</td>
+<td><code>kernel/</code>, <code>jit/</code>, <code>emu/</code>, <code>asbestos/</code></td>
+</tr>
+<tr>
+<td>هسته مهمان</td>
+<td>پیاده‌سازی syscallها: <code>kernel/</code> با ۵۹ فایل — <code>fork.c</code>, <code>mmap.c</code>, <code>signal.c</code>, <code>epoll.c</code>, <code>netlink</code>…</td>
+<td><code>kernel/*.c</code></td>
+</tr>
+<tr>
+<td>کامپوزیتور</td>
+<td><code>ishwl</code>: یک کامپوزیتور Wayland کوچک داخل مهمان؛ پیکسل هر پنجره از طریق فایل‌های mmap به اپ می‌رسد</td>
+<td><code>wl-bridge/</code></td>
+</tr>
+<tr>
+<td>دسکتاپ</td>
+<td>DesktopKit: پنجره‌ها، tiling، workspace، تم‌ها، استور — SwiftUI</td>
+<td><code>desktop/DesktopKit/</code></td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>virtio-gpu در شبیه‌ساز → virglrenderer (Venus) → MoltenVK → Metal</td>
+<td><code>gpu/</code></td>
+</tr>
+</tbody></table>
+<p>مسیر یک پنجره لینوکسی تا iPad: <code>.desktop</code> → <code>ishwl-launch</code> → <code>fork/exec</code> در مهمان → بافر <code>wl_shm</code> → پل <code>LinuxGUIBridge</code> → یک <code>UIWindow</code> در DesktopKit. این زنجیره در <code>desktop/DesktopKit/Sources/DesktopKit/Linux/LinuxGUIBridge.swift</code> و <code>wl-bridge/src/main.c</code> قابل ردیابی است.</p>
+<h3>۱.۲ اعدادی که واقعاً وجود دارند</h3>
+<table>
+<thead>
+<tr>
+<th>چیز</th>
+<th>مقدار</th>
+<th>منبع</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>حجم سورس این مخزن</td>
+<td>۳۴ مگابایت، ۲٫۴۴۸ فایل</td>
+<td>اندازه‌گیری روی همین کپی</td>
+</tr>
+<tr>
+<td>System image پیش‌فرض</td>
+<td>۵۸۹ مبی‌بایت فشرده، ۲٫۲۴ گیگابایت بازشده، ۲۱۶٬۹۵۲ فایل</td>
+<td><code>release/CHECKLIST.md</code></td>
+</tr>
+<tr>
+<td>فایل نصب IPA نسخه ۱٫۵٫۰</td>
+<td>۶۳۷ مگابایت</td>
+<td><code>release/source.json</code></td>
+</tr>
+<tr>
+<td>اپ‌های استور</td>
+<td>۸۰۰ (۷۸۰ apk + ۲۰ پک)</td>
+<td><code>Resources/Store/store-index.json</code></td>
+</tr>
+<tr>
+<td>اپ‌های «Works well»</td>
+<td>۲۳ (۶ مورد Experimental، ۷۷۱ مورد «Not tested»)</td>
+<td><code>curation.json</code></td>
+</tr>
+<tr>
+<td>سرعت JIT نسبت به موتور gadget</td>
+<td>حدود ۴٫۸ برابر (Node حدود ۱۲ برابر)</td>
+<td>README + <code>jit/DESIGN.md</code></td>
+</tr>
+<tr>
+<td>پکیج‌های پایه مهمان</td>
+<td>Alpine 3.21 + Firefox ESR + Thunar + foot + Node 22 + git</td>
+<td><code>release/build-rootfs.sh</code></td>
+</tr>
+</tbody></table>
+<p>این‌ها اعداد یک پروژه‌ی «کاغذی» نیست. برای نمونه، <code>kernel/oom.c</code> یک OOM-killer واقعی با PSI شبیه‌سازی‌شده و <code>oom_score</code> پیاده کرده، و <code>release/build-rootfs.sh</code> پنج مرحله build دارد که واقعاً اجرا شده‌اند (لاگ اندازه‌ها در <code>SIZES-*.txt</code> تولید می‌شود).</p>
+<h3>۱.۳ سه ادعایی که باید با احتیاط خوانده شوند</h3>
+<p><strong>الف) «همه‌چیز روی iPad اجرا می‌شود»</strong> — نه. ماتریس سازگاری CLI در <code>benchmark/BENCHMARK_COMPAT.md</code> می‌گوید ۲۲۳ از ۲۲۳ تست پاس شده‌اند، اما همه‌شان ابزار خط فرمان‌اند (bash، gcc، python، node، apk). هیچ اپ GUI، هیچ اپ glibc/Electron و هیچ مرورگری در آن ماتریس نیست. ادعای «سازگاری کامل» از آن سند درنمی‌آید.</p>
+<p><strong>ب) «JIT به‌طور خودکار روشن است»</strong> — فقط اگر StikDebug نصب و pair شده باشد. بدون آن، اپ در «Compatibility mode» با موتور gadget اجرا می‌شود و همه‌چیز ۴ تا ۵ برابر کندتر است. برای iPadOS 26/27 مسیر TXM پیچیده‌تر هم هست (بخش ۶).</p>
+<p><strong>ج) «Firefox، VS Code، VLC، Thunar پنجره‌های native هستند»</strong> — درست است، اما با قیمت: VS Code و Wine از یک «جزیره glibc» با کتابخانه‌های Debian استفاده می‌کنند (<code>devtools/install-vscode.sh:45-56</code>)، و VLC از یک پلاگین Wayland از پیش ساخته‌شده (<code>release/CHECKLIST.md</code>). یعنی «native» یعنی پنجره native، نه باینری native.</p>
+<h3>۱.۴ مشکل پنهان: مهمان منقضی شده است</h3>
+<p><code>release/build-rootfs.sh:107-110</code> مخازن را روی <code>v3.21/main</code> و <code>v3.21/community</code> قفل می‌کند و minirootfs هم <code>3.21.0</code> است. بر اساس تقویم رسمی Alpine، <strong>شاخه 3.21 در ۱ نوامبر ۲۰۲۶ به EOL رسید</strong>؛ شاخه پایدار فعلی 3.24.4 است. پیامدهای عملی:</p>
+<ul>
+<li><code>apk upgrade</code> دیگر وصله امنیتی نمی‌آورد (فقط چیزی که در آینه 3.21 مانده).</li>
+<li>نسخه‌های Qt 6.11 / GTK / GNOME 50 / LLVM 22 که در 3.24 هستند در دسترس نیستند؛ بخشی از ناسازگاری اپ‌های Qt6 دقیقاً از همین نسخه‌های قدیمی می‌آید (<code>release/CHECKLIST.md</code> درباره Falkon).</li>
+<li>Mesa از edge می‌آید و با <code>linpad-pin-edge</code> قفل شده؛ این قفل روی 3.21 شکننده‌تر می‌شود.</li>
+</ul>
+<p>این تنها موردی است که بدون build دوباره system image حل نمی‌شود — و در بخش ۳٫۳ آمده است.</p>
+<hr>
+<h2>۲. سخت‌افزار M5 در برابر محدودیت‌های iPadOS</h2>
+<h3>۲.۱ مشخصات دقیق مدل شما</h3>
+<table>
+<thead>
+<tr>
+<th>مشخصه</th>
+<th>iPad Pro M5 ۲۵۶/۵۱۲ گیگ</th>
+<th>معنایش برای LinPad</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>رم</td>
+<td>۱۲ گیگابایت یکپارچه</td>
+<td>سقف واقعی را iPadOS تعیین می‌کند، نه این عدد</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>۹ هسته: ۳ عملکردی + ۶ کم‌مصرف</td>
+<td>ترجمه JIT تک‌رشته‌ای است؛ هسته‌های P مهم‌ترند</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>۱۰ هسته با Neural Accelerator</td>
+<td>مسیر Venus/zink حداکثر از آن بهره می‌برد</td>
+</tr>
+<tr>
+<td>پهنای باند حافظه</td>
+<td>۱۵۳ گیگابایت بر ثانیه</td>
+<td>برای کپی بافرهای Wayland و حافظه مهمان کافی است</td>
+</tr>
+<tr>
+<td>نمایشگر</td>
+<td>۱۱ اینچ ۲۴۲۰×۱۶۶۸ یا ۱۳ اینچ ۲۷۵۲×۲۰۶۴</td>
+<td>در مقیاس ۲، بار رندر نرم‌افزاری بالاست</td>
+</tr>
+</tbody></table>
+<p>نکته مهم: نسخه ۱ ترابایتی و ۲ ترابایتی همان M5 با <strong>۱۶ گیگابایت رم و ۱۰ هسته CPU</strong> است. اگر روزی حافظه کم آوردید، تفاوت نسخه سخت‌افزاری است، نه تنظیمات.</p>
+<h3>۲.۲ گلوگاه واقعی: jetsam، نه رم</h3>
+<p>اپ iOS یک سقف حافظه «برای هر پروسه» دارد و وقتی به آن برسد، کل اپ کشته می‌شود — حتی اگر دستگاه ۱۲ گیگابایت رم داشته باشد. خود پروژه هم این را می‌داند:</p>
+<ul>
+<li><code>release/INSTALL-DEVICE.md:120-124</code> می‌گوید build فعلی entitlement مربوط به افزایش سقف را <strong>ندارد</strong> و jetsam ممکن است اپ را حدود ۳ گیگابایت روی یک آیپد ۸ گیگی بکشد.</li>
+<li><code>CHECKLIST.md</code> می‌گوید افزودن <code>com.apple.developer.kernel.increased-memory-limit</code> «اول باید توافق‌نامه برنامه توسعه‌دهنده را در developer.apple.com بپذیرید، بعد کلید را به <code>app/iSH.entitlements</code> اضافه کنید».</li>
+</ul>
+<p>اندازه‌گیری‌های مستقل (غیررسمی) روی یک آیفون ۱۲ گیگی: حدود ۳٫۳ گیگابایت بدون entitlement و ۶ تا ۸ گیگابایت با آن. اپل عدد رسمی منتشر نمی‌کند و برای iPad Pro M5 ۱۲ گیگی هیچ اندازه‌گیری معتبری وجود ندارد. بنابراین عدد دقیق را باید خودتان با «Settings › Desktop › Performance overlay» و گزارش‌های <code>jetsam</code> روی دستگاه اندازه بگیرید.</p>
+<p>این تنها تغییری است که سقف را جابه‌جا می‌کند؛ بقیه تنظیمات فقط داخل همان سقف جا باز می‌کنند.</p>
+<h3>۲.۳ چرا اضافه‌کردن entitlement برای شما راحت‌تر از بقیه است</h3>
+<p>AltStore Classic از نسخه ۲٫۲ (آوریل ۲۰۲۵) اپ‌هایی را که این entitlement را دارند، <strong>حتی با Apple ID رایگان</strong> نصب می‌کند. یعنی برای ساختن بیلد شخصی، لازم نیست حتماً حساب توسعه‌دهنده ۹۹ دلاری داشته باشید — اما اگر Xcode با تیم رایگان هنگام امضا خطا داد، تنها کاری که باید بکنید حذف همان پنج خط از <code>app/iSH.entitlements</code> است (بخش ۳٫۲).</p>
+<h3>۲.۴ JIT: تنها چیزی که ۴ تا ۵ برابر سرعت می‌دهد</h3>
+<p>بدون JIT، هر دستور مهمان با موتور gadget (ترجمه‌شده به بلوک‌های C) اجرا می‌شود. با JIT، کد ARM64 مهمان به کد ARM64 میزبان ترجمه و در یک ناحیه اجرایی ۱۲۸ تا ۵۱۲ مگابایتی کش می‌شود.</p>
+<ul>
+<li>مقدار پیش‌فرض کش در <code>jit/codemem.c:221</code> بر اساس حافظه آزاد انتخاب می‌شود: بیشتر از ۳ گیگابایت → ۲۵۶ مگابایت.</li>
+<li>در <code>jit/codemem.c:216-219</code> صریحاً نوشته شده که Firefox حدود ۳۵۰ مگابایت ترجمه در همه پروسه‌هایش نیاز دارد؛ در ۱۲۸ مگابایت «همیشه دوباره ترجمه می‌کند» و در ۲۵۶ «تقریباً جا می‌شود».</li>
+<li>اپ می‌تواند با <code>ISH_JIT_CACHE_MB</code> این را از Settings › Fast Mode › Code cache تنظیم کند، و <code>AppDelegate.m:242-246</code> تا ۱۰۲۴ مگابایت را قبول می‌کند — اما لیست UI در <code>FastMode.swift:64</code> فقط تا ۵۱۲ می‌رفت. <strong>این را در پچ ما به ۷۶۸ و ۱۰۲۴ گسترش دادیم.</strong></li>
+</ul>
+<p>برای M5 با ۱۲ گیگابایت، ۵۱۲ مگابایت انتخاب درست است؛ ۷۶۸ فقط اگر هم‌زمان سه چهار اپ سنگین باز می‌کنید معنا دارد (و هر مگابایت کش، یک مگابایت از سقف jetsam را می‌خورد).</p>
+<hr>
+<h2>۳. شخصی‌سازی و بهینه‌سازی برای M5 / ۱۲ گیگابایت</h2>
+<p>سه لایه وجود دارد. لایه A امروز و بدون هیچ ابزار اضافه‌ای روی دستگاه شما اجرا می‌شود؛ لایه B یک build دوباره اپ روی مک می‌خواهد؛ لایه C یک build دوباره system image.</p>
+<table>
+<thead>
+<tr>
+<th>لایه</th>
+<th>چه چیزی</th>
+<th>ابزار لازم</th>
+<th>سود تقریبی</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>تنظیمات اپ + اسکریپت مهمان</td>
+<td>فقط ترمینال LinPad</td>
+<td>متوسط تا زیاد (کش JIT، کش Firefox، malloc)</td>
+</tr>
+<tr>
+<td>B</td>
+<td>پچ روی سورس اپ</td>
+<td>مک + Xcode</td>
+<td>زیاد (سقف حافظه، swapfile، کش ۱ گیگ)</td>
+</tr>
+<tr>
+<td>C</td>
+<td>بازسازی system image روی Alpine 3.24</td>
+<td>مک + شبکه + حدود ۱ ساعت</td>
+<td>زیاد (بسته‌های جدیدتر، امنیت)</td>
+</tr>
+</tbody></table>
+<h3>۳.۱ لایه A — بدون build، همین امروز</h3>
+<h4>الف) تنظیمات خود اپ (Settings)</h4>
+<table>
+<thead>
+<tr>
+<th>تنظیم</th>
+<th>مسیر</th>
+<th>مقدار برای M5/۱۲GB</th>
+<th>چرا</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Code cache</td>
+<td>Settings › Fast Mode › Code cache</td>
+<td><strong>۵۱۲ MB</strong></td>
+<td>Firefox حدود ۳۵۰ مگابایت ترجمه می‌خواهد؛ ۲۵۶ باعث ترجمه مکرر می‌شود</td>
+</tr>
+<tr>
+<td>Fast mode</td>
+<td>Settings › Fast Mode</td>
+<td><strong>Automatic (StikDebug)</strong></td>
+<td>بدون آن ۴ تا ۵ برابر کندتر</td>
+</tr>
+<tr>
+<td>Close apps when memory runs out</td>
+<td>Settings › Memory</td>
+<td><strong>روشن</strong></td>
+<td>با ۱۲ گیگابایت هم یک محافظ لازم است؛ خاموش‌کردن یعنی iPadOS کل اپ را می‌کشد</td>
+</tr>
+<tr>
+<td>Never close</td>
+<td>Settings › Memory</td>
+<td><code>code, firefox-esr, ishwl, foot</code></td>
+<td>جلوگیری از بسته‌شدن ادیتور یا مرورگر هنگام فشاری که خودشان ایجاد کرده‌اند</td>
+</tr>
+<tr>
+<td>Performance overlay</td>
+<td>Settings › Desktop</td>
+<td>برای اولین روزها روشن</td>
+<td>تنها راه دیدن <code>phys_footprint</code> واقعی روی این دستگاه</td>
+</tr>
+</tbody></table>
+<p>نکته: مقدار «Code cache» فقط در <strong>اجرای بعدی</strong> اثر می‌گذارد، چون <code>AppDelegate.m:242-246</code> آن را قبل از شروع JIT به محیط می‌دهد.</p>
+<h4>ب) اسکریپت <code>m5-tune.sh</code></h4>
+<p>فایل تحویلی: <code>personalize/m5-tune.sh</code>. داخل ترمینال LinPad (که با کاربر root باز می‌شود):</p>
+<pre><code class="language-sh"># فایل را داخل مهمان کپی کنید (از Files، یا با curl اگر جایی منتشرش کردید)
+sh /root/m5-tune.sh --status   # ببینید الان چه چیزی اعمال است
+sh /root/m5-tune.sh            # اعمال پروفایل
+# بعد از اعمال: Settings › Lock Screen › Restart Desktop Session
+sh /root/m5-tune.sh --undo     # برگشت به تنظیمات اصلی LinPad
+</code></pre>
+<p>این اسکریپت <strong>دو فایل</strong> می‌نویسد و یک بلوک به فایل سوم اضافه می‌کند؛ از هر فایل قبلی نسخه پشتیبان می‌گیرد:</p>
+<table>
+<thead>
+<tr>
+<th>فایل</th>
+<th>چه می‌کند</th>
+<th>مقدار پیش‌فرض LinPad</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/etc/ishwl/session.d/25-m5.sh</code></td>
+<td><code>MALLOC_ARENA_MAX=6</code> برای اپ‌های glibc (VS Code، Wine)</td>
+<td>۲ (فایل <code>15-lowmem.sh</code>)</td>
+</tr>
+<tr>
+<td><code>/etc/profile.d/99-linpad-m5.sh</code></td>
+<td><code>NODE_OPTIONS=--max-old-space-size=4096</code></td>
+<td>تنظیم نشده</td>
+</tr>
+<tr>
+<td><code>/usr/lib/firefox-esr/browser/defaults/preferences/ish-tune.js</code></td>
+<td>یک بلوک مشخص در انتهای فایل: کش و پروسه بیشتر برای Firefox</td>
+<td>یک پروسه، کش کوچک (<code>gecko-tune.sh</code>)</td>
+</tr>
+</tbody></table>
+<p>مقادیر Firefox که عوض می‌شوند (با دلیل):</p>
+<table>
+<thead>
+<tr>
+<th>کلید</th>
+<th>LinPad</th>
+<th>پروفایل M5</th>
+<th>دلیل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dom.ipc.processCount</code></td>
+<td>۱</td>
+<td>۲</td>
+<td>با ۱۲ گیگابایت و کش ۵۱۲ مجاز است؛ بیشتر از ۲ فقط با کش ۱ گیگابایت</td>
+</tr>
+<tr>
+<td><code>browser.cache.memory.capacity</code> (KB)</td>
+<td>۱۶۳۸۴</td>
+<td>۶۵۵۳۶</td>
+<td>رم بیشتر، کش بیشتر</td>
+</tr>
+<tr>
+<td><code>image.mem.surfacecache.max_size_kb</code></td>
+<td>۱۳۱۰۷۲</td>
+<td>۲۶۲۱۴۴</td>
+<td>تصاویر بزرگ‌تر بدون decode مکرر</td>
+</tr>
+<tr>
+<td><code>media.memory_caches_combined_limit_kb</code></td>
+<td>۶۵۵۳۶</td>
+<td>۱۳۱۰۷۲</td>
+<td>پخش ویدیو روان‌تر</td>
+</tr>
+<tr>
+<td><code>browser.sessionhistory.max_total_viewers</code></td>
+<td>۰</td>
+<td>۴</td>
+<td>Back/Forward بدون رندر دوباره</td>
+</tr>
+<tr>
+<td><code>layout.css.stylo-threads</code></td>
+<td>۲</td>
+<td>۴</td>
+<td>۳ هسته عملکردی + ۶ کم‌مصرف</td>
+</tr>
+<tr>
+<td><code>javascript.options.mem.gc_max_helper_threads</code></td>
+<td>۲</td>
+<td>۳</td>
+<td>GC موازی‌تر</td>
+</tr>
+<tr>
+<td><code>browser.tabs.min_inactive_duration_before_unload</code> (ms)</td>
+<td>۶۰۰۰۰</td>
+<td>۳۰۰۰۰۰</td>
+<td>تب‌های پس‌زمینه دیرتر آزاد می‌شوند</td>
+</tr>
+</tbody></table>
+<p>نکته مهم درباره‌ی «مقدار بیشتر همیشه بهتر است»: این‌جا نه. هر پروسه اضافه Firefox یک ترجمه کامل دیگر از <code>libxul</code> می‌خواهد؛ روی شبیه‌ساز، رم زیاد به‌درد نمی‌خورد اگر کش کد تمام شود. به همین دلیل پیش‌فرض را روی ۲ گذاشتیم و بالا بردنش را مشروط به کش ۱ گیگابایت کردیم.</p>
+<h4>ج) تنظیمات مهمان که فقط با دستور ممکن است</h4>
+<pre><code class="language-sh"># 1. وضعیت واقعی حافظه و GPU
+cat /proc/ish/memory
+vulkaninfo --summary | grep deviceName
+
+# 2. اپ‌های سنگین را از کشتن معاف کنید (تا ری‌استارت بعدی)
+printf &#39;protect code,firefox-esr\n&#39; &gt; /proc/ish/oom
+
+# 3. به‌روزرسانی بسته‌های موجود (روی 3.21، فقط چیزی که در آینه مانده)
+apk update &amp;&amp; apk upgrade
+</code></pre>
+<h3>۳.۲ لایه B — پچ روی اپ (ساخته و اعمال شد)</h3>
+<p>فایل: <code>personalize/app-m5.patch</code> — <strong>روی همین کپی اعمال شده است</strong>. سه تغییر:</p>
+<table>
+<thead>
+<tr>
+<th>تغییر</th>
+<th>فایل</th>
+<th>خط</th>
+<th>اثر</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>سقف حافظه iPadOS</td>
+<td><code>app/iSH.entitlements</code></td>
+<td>+۵ خط</td>
+<td>اضافه‌شدن <code>com.apple.developer.kernel.increased-memory-limit</code></td>
+</tr>
+<tr>
+<td>کش کد ۷۶۸/۱۰۲۴</td>
+<td><code>FastMode.swift:64</code></td>
+<td>۱ خط</td>
+<td>گزینه‌های بزرگ‌تر در UI</td>
+</tr>
+<tr>
+<td>swapfile فشاری</td>
+<td><code>app/AppDelegate.m</code></td>
+<td>+۱۷ خط</td>
+<td>فعال‌کردن <code>ISH_SWAPFILE=pressure</code> روی دستگاه‌های ≥ ۶ گیگابایت</td>
+</tr>
+</tbody></table>
+<p><strong>درباره swapfile.</strong> جالب‌ترین چیزی که در سورس پیدا شد: <code>kernel/swapfile.c</code> کامل پیاده شده اما <strong>هیچ‌جا از سمت اپ روشن نمی‌شود</strong>. سازوکارش این است که حافظه ناشناس مهمان را در یک فایل sparse حذف‌شده در <code>TMPDIR</code> اپ map می‌کند؛ چون این صفحات «external» هستند، در <code>phys_footprint</code> (عددی که jetsam با آن مقایسه می‌کند) حساب نمی‌شوند و iPadOS می‌تواند آن‌ها را روی SSD بنویسد و آزاد کند. حالت <code>pressure</code> فقط وقتی فعال می‌شود که به حد فشار نزدیک شده باشیم.</p>
+<p>این یعنی با ۱۲ گیگابایت رم، مهمان می‌تواند عملاً از سقف jetsam هم عبور کند — به قیمت نوشتن روی SSD و کندی موقت. <strong>این مسیر در نسخه منتشرشده تست نشده و کامنت خود سورس آن را «prototype for measuring» می‌نامد.</strong> پس:</p>
+<ul>
+<li>قبل از استفاده، از مهمان backup بگیرید (Settings › Maintenance › Backup).</li>
+<li>اگر ناپایداری دیدید، با <code>LINPAD_NO_SWAPFILE=1</code> (یا حذف فراخوانی) خاموشش کنید.</li>
+<li>نوشتن روی SSD یعنی مصرف عمر درایو و مصرف باتری بیشتر؛ برای کارهای سبک لازم نیست.</li>
+</ul>
+<p><strong>اعمال و برگرداندن پچ:</strong></p>
+<pre><code class="language-sh"># روی مک، داخل کلون پروژه
+git apply --check personalize/app-m5.patch    # تست
+git apply personalize/app-m5.patch            # اعمال
+git apply -R personalize/app-m5.patch         # برگرداندن همه تغییرات
+</code></pre>
+<p>اگر Xcode هنگام امضا خطای entitlement داد (تیم رایگان)، فقط این پنج خط را از <code>app/iSH.entitlements</code> بردارید:</p>
+<pre><code class="language-xml">&lt;key&gt;com.apple.developer.kernel.increased-memory-limit&lt;/key&gt;
+&lt;true/&gt;
+</code></pre>
+<p><strong>ساخت روی مک (خلاصه؛ جزئیات در <code>release/INSTALL-DEVICE.md</code>):</strong></p>
+<pre><code class="language-sh">export PATH=/opt/homebrew/opt/lld/bin:/opt/homebrew/opt/llvm/bin:$PATH
+gpu/build-third-party.sh          # یک‌بار
+release/build-rootfs.sh           # حدود ۵۰ دقیقه
+xcodebuild -skipMacroValidation -project iSH.xcodeproj -scheme iSH-ARM64 \
+  -configuration Release -destination generic/platform=iOS \
+  -allowProvisioningUpdates SYMROOT=$PWD/build-ios-release \
+  IPHONEOS_DEPLOYMENT_TARGET=16.0 DEVELOPMENT_TEAM=&lt;TEAM&gt; ISH_JIT_BUILD=enabled build
+release/embed-rootfs.sh --device &quot;build-ios-release/Release-iphoneos/iSH ARM64.app&quot; \
+  release/out/ish-linux-rootfs-arm64.tar.gz
+</code></pre>
+<h3>۳.۳ لایه C — بازسازی system image روی Alpine 3.24</h3>
+<p>این تنها کاری است که به macOS نیاز دارد و در همین گزارش نمی‌توانم انجامش دهم، ولی تغییراتش کوچک و مشخص است:</p>
+<table>
+<thead>
+<tr>
+<th>فایل</th>
+<th>خط</th>
+<th>تغییر</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>release/build-rootfs.sh</code></td>
+<td>۵۳</td>
+<td><code>MINIROOTFS=alpine-minirootfs-3.24.4-aarch64.tar.gz</code></td>
+</tr>
+<tr>
+<td><code>release/build-rootfs.sh</code></td>
+<td>۱۰۸-۱۰۹</td>
+<td><code>v3.24/main</code> و <code>v3.24/community</code></td>
+</tr>
+<tr>
+<td><code>release/guest/linpad-pin-edge</code></td>
+<td>—</td>
+<td>بدون تغییر (خودش نسخه‌های جدیدتر از مخازن را قفل می‌کند)</td>
+</tr>
+<tr>
+<td><code>gpu/rootfs-add-gpu.sh</code></td>
+<td>۱۵</td>
+<td>بازبینی Mesa: <code>edge</code> همچنان لازم است، ولی نسخه قفل‌شده <code>26.2.4-r0</code> را باید با نسخه موجود هم‌خوان کرد</td>
+</tr>
+<tr>
+<td><code>release/guest/linpad/store/linpad-store-index.mjs</code></td>
+<td>۲۴</td>
+<td><code>BRANCH=&#39;v3.21&#39;</code> → <code>&#39;v3.24&#39;</code></td>
+</tr>
+</tbody></table>
+<p>سود: Qt 6.11 و GTK/GNOME جدیدتر، LLVM 22، ابزارهای ساختی که روی 3.21 نیستند، و — مهم‌تر از همه — وصله‌های امنیتی. ریسک: Mesa و <code>linpad-pin-edge</code> باید دوباره کالیبره شوند، و بعضی پک‌ها (Falkon، LibreOffice) ممکن است رفتار متفاوتی بدهند. قبل از انتشار، <code>release/check-public-rootfs.sh</code> و <code>release/CHECKLIST.md</code> را اجرا کنید.</p>
+<p>اگر عجله ندارید: 3.23 (EOL نوامبر ۲۰۲۷) محافظه‌کارانه‌تر از 3.24 است و تغییرات کمتری در Mesa/Qt دارد.</p>
+<h3>۳.۴ نکات جانبی برای fork شخصی</h3>
+<p>چند چیز کوچک که در یک fork شخصی ارزش اصلاح دارند:</p>
+<ul>
+<li>دارایی <code>app/Assets.xcassets/Saddam Hussein.imageset/</code> (فایل <code>satanusen.png</code>) هیچ‌جا استفاده نمی‌شود — یک باقیمانده از دوره iSH است. حذفش حجم بیلد را کم می‌کند و بازبینی کد را تمیزتر.</li>
+<li><code>MARKETING_VERSION</code> در <code>app/Project.xcconfig</code> روی <code>1.3.3</code> است در حالی که آخرین نسخه منتشرشده ۱٫۵٫۰ و <code>docs/idle-power.md</code> از «1.5.0 (4428)» حرف می‌زند. برای fork خودتان یک شناسه معنادار بگذارید (مثلاً <code>1.5.0-m5</code>)، وگرنه اپ متوجه نمی‌شود نسخه جدیدتر است.</li>
+<li><code>release/source.json</code> را برای fork خودتان به مخزن خودتان اشاره بدهید تا SideStore به‌روزرسانی‌های شما را ببیند.</li>
+</ul>
+<hr>
+<h2>۴. «نصب هر نرم‌افزار لینوکسی» — واقعیت چیست</h2>
+<h3>۴.۱ ماتریس فرمت‌ها</h3>
+<p>پرسش شما دقیقاً همین است: نرم‌افزاری که «در سطح همه نرم‌افزارها منتشر شده» راحت نصب شود. جدول زیر بر اساس سورس و مستندات پروژه است، نه حدس:</p>
+<table>
+<thead>
+<tr>
+<th>فرمت / منبع</th>
+<th>امروز در LinPad</th>
+<th>چرا</th>
+<th>راه‌حل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>بسته Alpine (apk)</td>
+<td><strong>کار می‌کند</strong></td>
+<td>مخازن main+community روی 3.21</td>
+<td>استور ۷۸۰ اپ دارد؛ از ترمینال هر بسته‌ای نصب می‌شود</td>
+</tr>
+<tr>
+<td><code>.deb</code> (aarch64، glibc)</td>
+<td><strong>امکان‌پذیر، مسیر ندارد</strong></td>
+<td>musl در برابر glibc</td>
+<td><code>linpad-get</code> (ساخته شد)</td>
+</tr>
+<tr>
+<td>AppImage</td>
+<td><strong>امکان‌پذیر، مسیر ندارد</strong></td>
+<td>FUSE نیست</td>
+<td><code>linpad-get</code> با <code>--appimage-extract</code></td>
+</tr>
+<tr>
+<td>tarball <code>.tar.gz/.xz/zst</code></td>
+<td><strong>امکان‌پذیر، مسیر ندارد</strong></td>
+<td>فقط پک‌های دستی مثل VS Code</td>
+<td><code>linpad-get</code></td>
+</tr>
+<tr>
+<td><code>.rpm</code></td>
+<td>امکان‌پذیر (libarchive)</td>
+<td>فقط بسته‌های aarch64 معنا دارد</td>
+<td><code>linpad-get</code></td>
+</tr>
+<tr>
+<td>Flatpak</td>
+<td><strong>غیرممکن</strong></td>
+<td>به user namespace و bubblewrap نیاز دارد؛ <code>clone(CLONE_NEWUSER)</code> در <code>kernel/fork.c</code> با <code>EINVAL</code> رد می‌شود</td>
+<td>هیچ</td>
+</tr>
+<tr>
+<td>Snap</td>
+<td><strong>غیرممکن</strong></td>
+<td>به systemd نیاز دارد؛ مهمان OpenRC/بدون init است</td>
+<td>هیچ</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td><strong>غیرممکن</strong></td>
+<td>namespace، cgroup، overlayfs</td>
+<td>هیچ</td>
+</tr>
+<tr>
+<td>نرم‌افزار x86_64 لینوکسی</td>
+<td><strong>غیرممکن به‌طور مستقیم</strong></td>
+<td><code>kernel/elf.h:24</code> فقط <code>EM_AARCH64</code> را قبول می‌کند</td>
+<td>Box64 (آزمایشی، از طریق Wine pack)</td>
+</tr>
+<tr>
+<td>اپ Electron/Chromium glibc</td>
+<td><strong>سخت اما ممکن</strong></td>
+<td>glibc + نیاز به <code>--no-sandbox</code></td>
+<td><code>linpad-get</code> + جزیره glibc</td>
+</tr>
+<tr>
+<td>اپ WebKitGTK</td>
+<td><strong>غیرممکن</strong></td>
+<td>لایه سوکت شبیه‌ساز پشتیبانی نمی‌کند (<code>CHECKLIST.md:113</code>)</td>
+<td>هیچ</td>
+</tr>
+<tr>
+<td>وابسته به systemd (udev، journald…)</td>
+<td><strong>غیرممکن</strong></td>
+<td>init متفاوت است</td>
+<td>هیچ</td>
+</tr>
+<tr>
+<td>درایور کرنل / سخت‌افزار</td>
+<td><strong>غیرممکن</strong></td>
+<td>شبیه‌ساز کرنل واقعی نیست</td>
+<td>هیچ</td>
+</tr>
+</tbody></table>
+<h3>۴.۲ چهار دیوار</h3>
+<p><strong>دیوار ۱ — معماری.</strong> مهمان aarch64 است و هسته فقط ELF آرم ۶۴ بیتی را اجرا می‌کند (<code>kernel/elf.h:24</code>). هر باینری x86_64 — که اکثر بسته‌های «منتشرشده برای لینوکس» هستند — بدون لایه ترجمه باینری اجرا نمی‌شود. Box64 (که در پک <code>wine-x86</code> استفاده شده) می‌تواند بخشی از این کار را بکند، اما روی شبیه‌ساز یعنی ترجمه روی ترجمه و سرعت غیرقابل استفاده برای کار جدی.</p>
+<p><strong>دیوار ۲ — libc.</strong> اکوسیستم لینوکس دو نیمه است: glibc (Debian/Ubuntu/Fedora و تقریباً همه باینری‌های منتشرشده) و musl (Alpine). LinPad سمت musl است. پروژه برای VS Code و Wine یک «جزیره» ساخته: کتابخانه‌های Debian در <code>/usr/lib/aarch64-linux-gnu</code> و لودر در <code>/lib/ld-linux-aarch64.so.1</code>. این ایده کاملاً عمومی است و در <code>linpad-get</code> به یک سرویس نصب تبدیل شده. <code>gcompat</code> هم در Alpine هست، اما ناقص است و برای اپ‌های GUI جدی کافی نیست.</p>
+<p><strong>دیوار ۳ — namespace و FUSE.</strong> <code>CLONE_NEWUSER</code> و بقیه پرچم‌های namespace در <code>kernel/fork.c</code> با <code>EINVAL</code> برگردانده می‌شوند، <code>/dev/fuse</code> وجود ندارد. Flatpak، Snap، Docker و AppImage نوع ۲ همه به یکی از این دو نیاز دارند. این دیوار با کد مهمان یا اپ برداشته نمی‌شود؛ کار کرنل می‌خواهد.</p>
+<p><strong>دیوار ۴ — systemd.</strong> Snap و بخشی از نرم‌افزارهای دسکتاپ مدرن فرض می‌کنند <code>systemd</code> هست. مهمان LinPad init واقعی ندارد؛ <code>dbus</code> و <code>ishwl-session</code> نقشش را بازی می‌کنند، ولی <code>systemctl</code> نه.</p>
+<h3>۴.۳ وضعیت واقعی استور</h3>
+<p>استور در <code>desktop/DesktopKit/Sources/DesktopKit/Apps/Store/</code> یک ایندکس JSON می‌خواند که از APKINDEX های Alpine ساخته می‌شود:</p>
+<ul>
+<li>فقط <strong>اپ‌های دسکتاپ</strong> ایندکس می‌شوند: بسته‌هایی که AppStream دارند یا فایل <code>.desktop</code> دارند (<code>linpad-store-index.mjs:307-314</code>). ابزار خط فرمان دیده نمی‌شود مگر پک باشد.</li>
+<li>ایندکس روی <code>BRANCH=&#39;v3.21&#39;</code> و <code>REPOS=[&#39;main&#39;,&#39;community&#39;]</code> سخت‌کد شده است (<code>:24-30</code>).</li>
+<li>برچسب سازگاری فقط از <code>curation.json</code> می‌آید؛ ۷۷۱ اپ از ۸۰۰ «Not tested» هستند (<code>StoreIndex.swift:134-137</code>).</li>
+<li><strong>هر اپی که در ایندکس نباشد، در استور نصب نمی‌شود</strong> (<code>StoreModel.swift:210</code>). راه فرار: اپ «Packages» که <code>apk search</code> و <code>apk add</code> آزاد دارد، یا <code>linpad-get install apk:&lt;name&gt;</code>.</li>
+<li>بعد از نصب از اپ Packages، <strong>لانچر به‌روز نمی‌شود</strong> تا سشن ری‌استارت شود (<code>PackagesApp.swift:198</code> فقط <code>.guestFilesChanged</code> می‌فرستد). این یک باگ واقعی و آزاردهنده است.</li>
+</ul>
+<h3>۴.۴ چه چیزی امروز، بدون هیچ تغییری، کار می‌کند</h3>
+<p>اپ‌هایی که پروژه خودش «Works well» علامت زده: Firefox ESR، VS Code، Thunar/Files، VLC، GIMP (با قاعده X11)، Ristretto، Xarchiver، zathura، Claws Mail، Thunderbird، Transmission، FileZilla، Inkscape، SuperTux، Aisleriot، GNOME Mines، Zim، calcurse، tmux، Cheese، اسکنر OCR، Claude Code، GPU tools؛ LibreOffice (در استور «works» ولی در چک‌لیست انتشار تست نشده)، Audacity (آزمایشی)، Falkon/Dillo (آزمایشی)، Wine و Wine-x86 (آزمایشی).</p>
+<p><code>LinPad</code> با Node 22، npm، git، Python و ابزارهای build هم پایه است؛ یعنی هر چیزی که از <code>npm</code>/<code>pip</code> نصب شود مسیر عادی دارد.</p>
+<hr>
+<h2>۵. مسیر پیشنهادی: «نصب آسان» به‌جای «نصب دستی»</h2>
+<h3>۵.۱ چیزی که ساخته شد: <code>linpad-get</code></h3>
+<p>فایل: <code>personalize/linpad-get</code> — یک اسکریپت POSIX sh که داخل مهمان و با کاربر root اجرا می‌شود. <strong>بدون build دوباره اپ</strong> روی نسخه ۱٫۵٫۰ کار می‌کند، چون فقط از امکاناتی استفاده می‌کند که همین حالا در system image هست (<code>apk</code>, <code>node</code>, <code>debfetch.mjs</code>, جزیره glibc برای VS Code).</p>
+<pre><code class="language-sh">linpad-get install gimp                    # همان apk، مسیر مستقیم
+linpad-get install ./app.deb               # بسته Debian (aarch64)
+linpad-get install https://…/app.deb       # دانلود + نصب
+linpad-get install ./App.AppImage          # بدون FUSE باز می‌شود
+linpad-get install ./tool.tar.xz           # در /opt/linpad-get/&lt;name&gt;
+linpad-get install ./pkg.rpm               # از طریق libarchive
+linpad-get list                            # چه چیزی نصب شده
+linpad-get remove &lt;name&gt;                   # برگشت
+linpad-get island                          # ساخت/ترمیم جزیره glibc
+linpad-get doctor                          # بررسی محیط
+</code></pre>
+<p><strong>چطور کار می‌کند، در چهار جمله:</strong></p>
+<p>۱. فرمت را تشخیص می‌دهد (پسوند/اسکیم URL) و فایل را دانلود می‌کند.
+۲. برای <code>.deb</code>/<code>.rpm</code>، پیلود را با <code>bsdtar</code> باز می‌کند و <strong>هر فایل را جداگانه</strong> کپی می‌کند — با دو محافظ: هر فایلی که مال یک بسته apk باشد (<code>apk info -W</code>) بازنویسی نمی‌شود، و هیچ بسته‌ای اجازه ندارد فایل‌های جزیره glibc یا لودر را جایگزین کند. این جلوی خراب‌شدن libc، داده‌های XKB و خود VS Code را می‌گیرد.
+۳. اگر لودر Debian بتواند باینری را بارگذاری کند (یعنی glibc است، نه musl)، مطمئن می‌شود «جزیره glibc» هست و برایش یک لانچر در <code>/usr/local/bin</code> می‌سازد که <code>LD_PRELOAD</code> و <code>LD_LIBRARY_PATH</code> نشست را پاک می‌کند (وگرنه کتابخانه musl نشست داخل پروسه glibc بارگذاری می‌شود و کرش می‌کند — همان کاری که <code>devtools/vscode-launch</code> می‌کند).
+۴. برای AppImage، به‌جای FUSE از <code>--appimage-extract</code> استفاده می‌کند، در <code>/opt/linpad-get/&lt;name&gt;</code> می‌گذارد، <code>.desktop</code> را با <code>Exec=</code> درست بازنویسی می‌کند و آیکون را کپی می‌کند.</p>
+<p><strong>جزیره glibc</strong> از <code>devtools/debfetch.mjs</code> استفاده می‌کند — همان ابزاری که VS Code و Wine را نصب می‌کند — با فهرستی از ۴۷ بسته کتابخانه‌ای Debian trixie؛ نام هر ۴۷ مورد با ایندکس رسمی <code>trixie/main/binary-arm64</code> تطبیق داده شد و همه موجودند.</p>
+<p><strong>محدودیت‌های صادقانه‌ی این ابزار:</strong></p>
+<ul>
+<li>باینری‌های <strong>x86_64</strong> را نصب نمی‌کند؛ فقط aarch64.</li>
+<li>وابستگی‌های کتابخانه‌ای را خودکار از <code>Depends:</code> حل نمی‌کند؛ اگر کتابخانه‌ای کم باشد با <code>ld-linux --list</code> می‌گوید کدام است، ولی افزودنش دستی است (بسته Debian مربوطه را باید به فهرست جزیره اضافه کرد). برای اپ‌های معمولی GTK/Qt این فهرست کافی است؛ برای اپ‌های عجیب نه.</li>
+<li><code>.desktop</code>هایی که <code>Terminal=true</code> دارند توسط DesktopKit نادیده گرفته می‌شوند (<code>LinuxDesktopEntry.swift:60-63</code>)، پس اپ‌های خط فرمان باید از ترمینال اجرا شوند.</li>
+<li>بعد از نصب، <strong>لانچر را reload نمی‌کند</strong> (همان باگ سمت اپ). یا با <code>Restart Desktop Session</code> یا با لاگ‌اوت/ورود، آیکون ظاهر می‌شود.</li>
+</ul>
+<h3>۵.۲ اولویت‌های بعدی برای «نصب آسان‌تر» (از دید کد)</h3>
+<p>بر اساس بررسی سورس، این هفت تغییر بیشترین اثر را دارند. تخمین‌ها برای کسی است که با Swift/SwiftUI آشناست و محیط build دارد.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>تغییر</th>
+<th>نوع</th>
+<th>تخمین</th>
+<th>چرا مهم است</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>۱</td>
+<td>جست‌وجوی آزاد در استور برای «نصب با نام بسته» + شیت تأیید و تخمین حجم</td>
+<td>Swift</td>
+<td>۱ روز</td>
+<td>امروز فقط شناسه‌های ایندکس نصب‌شدنی‌اند (<code>StoreModel.swift:210</code>)</td>
+</tr>
+<tr>
+<td>۲</td>
+<td>وقتی بسته‌ای در ایندکس نیست، <code>linpad-apps</code> خودش <code>toolkitOf</code>/<code>launchNeeds</code> را از ماژول ایندکس وارد کند و قاعده X11 و wrapper را بسازد</td>
+<td>اسکریپت مهمان</td>
+<td>۲-۳ ساعت</td>
+<td>بدون این، نصب دستی «نصب می‌شود ولی باز نمی‌شود»</td>
+</tr>
+<tr>
+<td>۳</td>
+<td>بعد از هر تغییر بسته، لانچر را reload کن (<code>PackagesApp</code> → <code>loadApplications</code>)</td>
+<td>Swift</td>
+<td>۲ ساعت</td>
+<td>باگ فعلی: اپ نصب‌شده تا ری‌استارت دیده نمی‌شود</td>
+</tr>
+<tr>
+<td>۴</td>
+<td>ساخت فهرست <code>.desktop</code> در زمان refresh داخل مهمان (به‌جای HTML زمان build)</td>
+<td>اسکریپت مهمان</td>
+<td>۱ روز</td>
+<td>پیش‌نیاز پشتیبانی از هر مخزن جدید</td>
+</tr>
+<tr>
+<td>۵</td>
+<td>جدول توصیف مخزن (branch/repo/AppStream) به‌جای <code>BRANCH</code> ثابت، و خطاناپذیرکردن AppStream</td>
+<td>اسکریپت مهمان</td>
+<td>۱ روز</td>
+<td>امکان ایندکس‌کردن edge/testing و مخزن شخص ثالث</td>
+</tr>
+<tr>
+<td>۶</td>
+<td>رابط «مخازن apk» در تنظیمات با حفظ قفل‌های نسخه (<code>linpad-pin-edge</code>)</td>
+<td>Swift + اسکریپت</td>
+<td>۲ روز</td>
+<td>امروز مخازن داخل image ثابت‌اند</td>
+</tr>
+<tr>
+<td>۷</td>
+<td>نوع نصب «بسته خارجی» در کاتالوگ: <code>.deb</code>/AppImage با اسکریپت، <code>.desktop</code> خودکار، ثبت وضعیت</td>
+<td>Swift + اسکریپت</td>
+<td>۳-۴ روز</td>
+<td>همان کاری که <code>linpad-get</code> دستی می‌کند، ولی از UI</td>
+</tr>
+</tbody></table>
+<p>اگر هدف «کمترین کار برای بیشترین نتیجه» است، ترتیب ۳ ← ۲ ← ۱ را پیشنهاد می‌کنم.</p>
+<h3>۵.۳ گزینه‌های بلندپروازانه (با هزینه و ریسک)</h3>
+<table>
+<thead>
+<tr>
+<th>گزینه</th>
+<th>چه می‌دهد</th>
+<th>هزینه</th>
+<th>نظر</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Debian در chroot با proot</td>
+<td>تقریباً هر بسته <code>.deb</code> بدون بازسازی</td>
+<td>زیاد</td>
+<td>proot از ptrace استفاده می‌کند؛ هر syscall تله می‌شود. روی شبیه‌ساز احتمالاً غیرقابل استفاده است. <code>proot</code> در Alpine community هست، پس تستش ارزان است</td>
+</tr>
+<tr>
+<td>Box64 عمومی</td>
+<td>باینری‌های x86_64 لینوکسی</td>
+<td>متوسط</td>
+<td>همین حالا در پک <code>wine-x86</code> استفاده می‌شود؛ برای اپ‌های GUI واقعی‌گرایانه نیست</td>
+</tr>
+<tr>
+<td>Flatpak از طریق bwrap با setuid helper</td>
+<td>نه</td>
+<td>خیلی زیاد</td>
+<td>بدون namespace کرنل، bwrap نمی‌تواند sandbox بسازد؛ setuid در iOS هم منتفی است</td>
+</tr>
+<tr>
+<td>پورت FUSE در شبیه‌ساز</td>
+<td>AppImage بدون extract، برخی اپ‌ها</td>
+<td>خیلی زیاد</td>
+<td>کار کرنل؛ خارج از محدوده</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>۶. نصب روی iPad Pro M5 شما</h2>
+<h3>۶.۱ سه مسیر نصب</h3>
+<table>
+<thead>
+<tr>
+<th>مسیر</th>
+<th>چه می‌دهد</th>
+<th>محدودیت</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IPA آماده ۱٫۵٫۰ + SideStore/AltStore</td>
+<td>سریع‌ترین راه</td>
+<td>بدون پچ‌های M5؛ هر ۷ روز باید refresh شود</td>
+</tr>
+<tr>
+<td>بیلد خودتان روی مک + <code>ideviceinstaller</code></td>
+<td>کنترل کامل (پچ‌ها، entitlement، rootfs جدید)</td>
+<td>مک + Xcode + Apple ID</td>
+</tr>
+<tr>
+<td>iloader/Sideloadly</td>
+<td>فقط نصب IPA</td>
+<td>همان محدودیت ۷ روز</td>
+</tr>
+</tbody></table>
+<p><strong>محدودیت‌های حساب رایگان (۲۰۲۶):</strong> هم‌زمان ۳ اپ نصب‌شده (شامل خود SideStore)، هر اپ بعد از ۷ روز منقضی، و ۱۰ App ID متفاوت در هفته. StikDebug و LocalDevVPN هم اپ سایدلودشده‌اند و همین سهمیه را می‌خورند. با حساب ۹۹ دلاری: بدون سقف ۳ اپ و گواهی ۳۶۵ روزه.</p>
+<h3>۶.۲ JIT روی iPadOS 27.2</h3>
+<p>ترتیب کارها:</p>
+<p>۱. <strong>Developer Mode</strong> را در Settings › Privacy &amp; Security روشن کنید.
+۲. <strong>StikDebug</strong> را سایدلود کنید (نسخه‌ای که TXM را پشتیبانی می‌کند؛ برای iPadOS 26+ خودِ StikDebug می‌گوید «Supported — Limited App Availability»).
+۳. <strong>LocalDevVPN</strong> را نصب و متصل کنید (StikDebug از طریق loopback به دستگاه وصل می‌شود).
+۴. فایل pairing را از یک کامپیوتر بسازید (iloader این کار را می‌کند) و در StikDebug import کنید.
+۵. LinPad را از Home Screen باز کنید؛ اسپلش باید «Enabling fast mode via StikDebug…» بگوید و بعد Quick Settings وضعیت <strong>Native JIT ✓</strong> را نشان دهد.</p>
+<p>اگر شکست خورد: <code>Settings › Fast Mode › Status</code> دقیقاً می‌گوید کدام شرط برقرار نیست (StikDebug نصب نیست، get-task-allow نیست، یا بیلد بدون JIT است). «Retry fast mode» بعد از شروع لینوکس هم کار می‌کند، ولی فقط برای پروسه‌هایی که از آن لحظه به بعد اجرا می‌شوند.</p>
+<h3>۶.۳ چک‌لیست پس از نصب (روز اول)</h3>
+<pre><code class="language-sh"># ۱. آیا JIT روشن است؟
+fastfetch | head -20                  # باید Apple M5 و Venus را نشان دهد
+cat /proc/ish/memory | head -5        # footprint و allowance
+
+# ۲. حافظه واقعی چقدر است؟
+awk &#39;/MemTotal/ {print $2/1024 &quot; MB&quot;}&#39; /proc/meminfo
+
+# ۳. GPU
+vulkaninfo --summary | grep deviceName
+
+# ۴. به‌روزرسانی‌ها
+apk update &amp;&amp; apk upgrade
+</code></pre>
+<p>بعد در Settings:</p>
+<ul>
+<li>Code cache → ۵۱۲ مگابایت، سپس اپ را کامل ببندید و باز کنید.</li>
+<li>Performance overlay را روشن کنید و یک روز عادی کار کنید؛ عدد <code>phys_footprint</code> در اوج به شما می‌گوید چقدر به سقف jetsam نزدیک هستید. اگر در اوج از ۶۰٪ سقف رد شدید، entitlement را جدی بگیرید.</li>
+</ul>
+<h3>۶.۴ نکته مخصوص M5: نمایشگر و مقیاس</h3>
+<p>با نمایشگر ۲۷۵۲×۲۰۶۴ و مقیاس ۲، رندر نرم‌افزاری هر فریم گران است. اگر اپ‌های Wayland کند بودند، <code>/etc/ishwl/app-scale</code> را ببینید: خط <code>firefox-esr 2 1</code> یعنی در حالت عادی مقیاس ۲ و در fullscreen مقیاس ۱. برای کارهای گرافیکی، مقیاس ۱ در همه‌جا حدود یک‌سوم CPU هر فریم را کم می‌کند (به قیمت متن نرم‌تر).</p>
+<hr>
+<h2>۷. ریسک‌ها و محدودیت‌های سخت</h2>
+<table>
+<thead>
+<tr>
+<th>ریسک</th>
+<th>شدت</th>
+<th>توضیح</th>
+<th>کاهش</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Alpine 3.21 منقضی شده</td>
+<td>بالا</td>
+<td>از ۱ نوامبر ۲۰۲۶ وصله امنیتی ندارد</td>
+<td>مهاجرت به 3.24 (بخش ۳٫۳)</td>
+</tr>
+<tr>
+<td>همه‌چیز با root اجرا می‌شود</td>
+<td>متوسط</td>
+<td>ترمینال LinPad root است؛ <code>linpad-get</code> هم</td>
+<td>فقط از منابع رسمی نصب کنید؛ backup</td>
+</tr>
+<tr>
+<td>swapfile آزمایشی</td>
+<td>متوسط</td>
+<td>مسیر تست‌نشده در بیلد منتشرشده</td>
+<td>backup، <code>LINPAD_NO_SWAPFILE=1</code></td>
+</tr>
+<tr>
+<td>بازنویسی فایل‌های سیستمی با <code>.deb</code></td>
+<td>متوسط</td>
+<td>برخی بسته‌ها <code>/usr/lib</code> را عوض می‌کنند</td>
+<td>محافظ <code>apk info -W</code> در <code>linpad-get</code></td>
+</tr>
+<tr>
+<td>انقضای گواهی ۷ روزه</td>
+<td>بالا (عملیاتی)</td>
+<td>اپ و StikDebug هر هفته</td>
+<td>SideStore با refresh خودکار، یا حساب پولی</td>
+</tr>
+<tr>
+<td>iPadOS سقف حافظه را کم کند</td>
+<td>متوسط</td>
+<td>گزارش‌هایی از کاهش سقف در iPadOS 26.4 روی آیپد ۸ گیگی</td>
+<td>entitlement + اندازه‌گیری واقعی</td>
+</tr>
+<tr>
+<td>GPLv3</td>
+<td>کم</td>
+<td>اگر بیلد شخصی را پخش کنید، باید سورس بدهید</td>
+<td>برای استفاده شخصی مسئله‌ای نیست</td>
+</tr>
+<tr>
+<td>VS Code/Claude Code اختصاصی</td>
+<td>کم</td>
+<td>حق توزیع مجدد ندارند</td>
+<td>خودتان از سایت رسمی نصب می‌کنید (همین کاری که پروژه می‌کند)</td>
+</tr>
+<tr>
+<td>WebKitGTK</td>
+<td>بالا برای برخی اپ‌ها</td>
+<td>Geary، برخی مرورگرها</td>
+<td>Claws Mail به‌جای Geary</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>۸. برنامه اجرایی پیشنهادی</h2>
+<table>
+<thead>
+<tr>
+<th>گام</th>
+<th>کار</th>
+<th>زمان</th>
+<th>چرا این ترتیب</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>۰</td>
+<td><code>Settings › Maintenance › Backup</code> — اولین کار، قبل از هر آزمایش</td>
+<td>۵ دقیقه</td>
+<td>همیشه راه برگشت داشته باشید</td>
+</tr>
+<tr>
+<td>۱</td>
+<td>نصب ۱٫۵٫۰ با SideStore + StikDebug + LocalDevVPN</td>
+<td>۳۰-۶۰ دقیقه</td>
+<td>بدون JIT بقیه کارها دردناک است</td>
+</tr>
+<tr>
+<td>۲</td>
+<td>Code cache = ۵۱۲، Memory protect list، Performance overlay</td>
+<td>۵ دقیقه</td>
+<td>بیشترین سود با کمترین کار</td>
+</tr>
+<tr>
+<td>۳</td>
+<td><code>m5-tune.sh</code> را اجرا و سشن را ری‌استارت کنید</td>
+<td>۱۰ دقیقه</td>
+<td>کش Firefox و malloc</td>
+</tr>
+<tr>
+<td>۴</td>
+<td>یک روز کار عادی؛ عدد <code>phys_footprint</code> را یادداشت کنید</td>
+<td>—</td>
+<td>تصمیم می‌گیرید entitlement لازم است یا نه</td>
+</tr>
+<tr>
+<td>۵</td>
+<td>اگر مک دارید: پچ را روی کلون اعمال و بیلد کنید</td>
+<td>۲-۳ ساعت (+۵۰ دقیقه rootfs)</td>
+<td>سقف حافظه + swapfile + کش ۱ گیگ</td>
+</tr>
+<tr>
+<td>۶</td>
+<td><code>linpad-get</code> را نصب و با ۲-۳ اپ واقعی تست کنید (یک <code>.deb</code>، یک AppImage)</td>
+<td>۱ ساعت</td>
+<td>مسیر نصب عمومی</td>
+</tr>
+<tr>
+<td>۷</td>
+<td>اگر جواب داد: مهاجرت rootfs به 3.24</td>
+<td>نصف روز</td>
+<td>امنیت و بسته‌های جدید</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>۹. پاسخ کوتاه به سؤال اصلی</h2>
+<blockquote>
+<p>«می‌خواهم نرم‌افزارهای لینوکسی که همه‌جا منتشر شده‌اند، راحت روی این سیستم نصب شوند.»</p>
+</blockquote>
+<p><strong>تا امروز:</strong> فقط بسته‌های Alpine. استور ۸۰۰ اپ دارد ولی ۷۷۱ موردش تست نشده و هر چیزی که apk نباشد مسیر نصب ندارد.</p>
+<p><strong>با کاری که در این گزارش انجام شد:</strong> <code>.deb</code>، AppImage، tarball و rpm هم نصب می‌شوند — با یک دستور، روی نسخه‌ای که همین حالا نصب می‌کنید، بدون build. محدودیت باقی‌مانده دیگر «نصب» نیست؛ «اجرا»ست: نرم‌افزارهای x86_64، WebKitGTK و هر چیزی که به systemd یا namespace نیاز دارد، روی این معماری اجرا نمی‌شوند.</p>
+<p><strong>آنچه هنوز واقعاً لازم است:</strong> یک دکمه در استور به اسم «نصب با نام یا فایل» که همان <code>linpad-get</code> را صدا بزند، و یک refresh لانچر بعد از نصب. این دو، فاصله بین «ابزار خط فرمان برای حرفه‌ای‌ها» و «نصب آسان برای همه» را پر می‌کند.</p>
+<hr>
+<h2>پیوست الف — فایل‌های تحویلی</h2>
+<table>
+<thead>
+<tr>
+<th>فایل</th>
+<th>چیست</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>docs/fa/linpad-m5-report.md</code></td>
+<td>همین گزارش</td>
+</tr>
+<tr>
+<td><code>personalize/m5-tune.sh</code></td>
+<td>پروفایل مهمان برای ۱۲ گیگابایت (اعمال/وضعیت/برگشت)</td>
+</tr>
+<tr>
+<td><code>personalize/linpad-get</code></td>
+<td>نصب‌کننده عمومی: apk، <code>.deb</code>، AppImage، tarball، rpm</td>
+</tr>
+<tr>
+<td><code>personalize/app-m5.patch</code></td>
+<td>پچ سمت اپ (اعمال‌شده در این کپی)</td>
+</tr>
+<tr>
+<td><code>personalize/README.md</code></td>
+<td>دستور نصب و استفاده، خلاصه</td>
+</tr>
+</tbody></table>
+<h2>پیوست ب — منابع</h2>
+<p><strong>داخل مخزن:</strong> <code>release/INSTALL-DEVICE.md</code>، <code>release/CHECKLIST.md</code>، <code>release/build-rootfs.sh</code>، <code>kernel/oom.c</code>، <code>kernel/swapfile.h</code>، <code>kernel/elf.h</code>، <code>kernel/fork.c</code>، <code>jit/codemem.c</code>، <code>devtools/install-vscode.sh</code>، <code>devtools/debfetch.mjs</code>، <code>release/guest/linpad/linpad-apps</code>، <code>release/guest/linpad/store/linpad-store-index.mjs</code>، <code>desktop/DesktopKit/Sources/DesktopKit/Apps/Store/*.swift</code>، <code>desktop/DesktopKit/Sources/DesktopKit/Core/System/FastMode.swift</code>.</p>
+<p><strong>بیرون:</strong> <a href="https://www.apple.com/ipad-pro/specs/">Apple — iPad Pro specs</a> · <a href="https://developer.apple.com/documentation/BundleResources/Entitlements/com.apple.developer.kernel.increased-memory-limit">Apple — increased-memory-limit</a> · <a href="https://github.com/StikDebug/StikDebug">StikDebug</a> · <a href="https://docs.sidestore.io/docs/faq">SideStore FAQ</a> · <a href="https://faq.altstore.io/altstore-pal-v.-altstore-classic">AltStore PAL vs Classic</a> · <a href="https://www.idownloadblog.com/2025/04/16/altstore-v2-2-released/">AltStore 2.2 و entitlement حافظه</a> · <a href="https://alpinelinux.org/releases/">Alpine releases</a> · <a href="https://alpinelinux.org/downloads/">Alpine downloads</a> · <a href="https://github.com/opa334/TrollStore">TrollStore</a> · <a href="https://docs.appimage.org/user-guide/run-appimages.html">AppImage docs</a>.</p>
+
+</body>
+</html>

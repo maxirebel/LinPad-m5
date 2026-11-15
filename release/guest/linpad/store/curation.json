@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "_comment": "Hand-curated layer of LinPad Store over store-index.json: home collections, hero banners and the 'Runs on LinPad' list. Entries name Alpine packages (aarch64, v3.21 main+community) or catalog.json pack ids prefixed with 'pack:'. compat status: works | experimental | broken; anything not listed shows 'Not tested'. 'verified' says where and when the status was checked.",
+  "hero": [
+    {
+      "app": "filezilla",
+      "title": "Move files to any server",
+      "subtitle": "FileZilla: FTP, FTPS and SFTP in a real desktop window.",
+      "tint": "#B4271F"
+    },
+    {
+      "app": "pack:image-editor",
+      "title": "Edit photos like a pro",
+      "subtitle": "GIMP 2.10 with layers, masks and filters.",
+      "tint": "#5C5543"
+    },
+    {
+      "app": "audacity",
+      "title": "Record and edit audio",
+      "subtitle": "Audacity: cut, mix and clean up recordings.",
+      "tint": "#1C3F95"
+    },
+    {
+      "app": "pack:wine",
+      "title": "Run Windows apps",
+      "subtitle": "Notepad++, 7-Zip and PuTTY through Wine.",
+      "tint": "#6B2B9E"
+    }
+  ],
+  "collections": [
+    {
+      "id": "developer",
+      "title": "Developer essentials",
+      "subtitle": "Editors, diffs and toolchains",
+      "apps": [
+        "pack:vscode",
+        "geany",
+        "meld",
+        "gitg",
+        "sqlitebrowser",
+        "pack:claude-code",
+        "pack:dev-extras",
+        "ghex",
+        "bluefish",
+        "thonny",
+        "pack:gpu"
+      ]
+    },
+    {
+      "id": "internet",
+      "title": "Internet",
+      "subtitle": "Browse, mail, chat and transfer",
+      "apps": [
+        "firefox-esr",
+        "filezilla",
+        "pack:mail",
+        "pack:mail-light",
+        "transmission-gtk",
+        "hexchat",
+        "pidgin",
+        "remmina",
+        "pack:browsers",
+        "liferea",
+        "dino"
+      ]
+    },
+    {
+      "id": "office",
+      "title": "Office",
+      "subtitle": "Documents, spreadsheets and PDFs",
+      "apps": [
+        "pack:office",
+        "gnumeric",
+        "abiword",
+        "pack:pdf",
+        "evince",
+        "xournalpp",
+        "foliate",
+        "ghostwriter",
+        "pack:notes",
+        "scribus"
+      ]
+    },
+    {
+      "id": "graphics",
+      "title": "Graphics",
+      "subtitle": "Paint, draw and organise photos",
+      "apps": [
+        "pack:image-editor",
+        "inkscape",
+        "krita",
+        "pack:image-viewer",
+        "shotwell",
+        "gthumb",
+        "pinta",
+        "kolourpaint",
+        "gpick",
+        "fontforge-gui",
+        "pack:camera"
+      ]
+    },
+    {
+      "id": "audio-video",
+      "title": "Audio & Video",
+      "subtitle": "Play, record and edit",
+      "apps": [
+        "pack:multimedia",
+        "audacity",
+        "mpv",
+        "celluloid",
+        "kdenlive",
+        "obs-studio",
+        "handbrake-gtk",
+        "audacious",
+        "strawberry",
+        "easytag",
+        "pack:recorder"
+      ]
+    },
+    {
+      "id": "creators",
+      "title": "Creators",
+      "subtitle": "Make music, video and art",
+      "apps": [
+        "audacity",
+        "kdenlive",
+        "krita",
+        "inkscape",
+        "lmms",
+        "musescore",
+        "hydrogen",
+        "obs-studio",
+        "blender",
+        "ardour",
+        "pack:recorder"
+      ]
+    },
+    {
+      "id": "utilities",
+      "title": "Utilities",
+      "subtitle": "Small tools that help every day",
+      "apps": [
+        "pack:archives",
+        "galculator",
+        "gnome-calculator",
+        "keepassxc",
+        "xfce4-taskmanager",
+        "baobab",
+        "simple-scan",
+        "gparted",
+        "pack:scanner",
+        "pack:calendar-cli"
+      ]
+    },
+    {
+      "id": "games",
+      "title": "Games that run well",
+      "subtitle": "Light 2D games for a quick break",
+      "apps": [
+        "aisleriot",
+        "gnome-mines",
+        "gnome-sudoku",
+        "gnome-chess",
+        "gnome-2048",
+        "kpat",
+        "supertux",
+        "pingus",
+        "lbreakout2"
+      ]
+    },
+    {
+      "id": "windows",
+      "title": "Windows apps (Wine)",
+      "subtitle": "Programs built for Windows",
+      "apps": [
+        "pack:wine",
+        "pack:wine-x86"
+      ]
+    }
+  ],
+  "compat": {
+    "firefox-esr": {
+      "status": "works",
+      "note": "Ships with LinPad."
+    },
+    "pack:mail-light": {
+      "status": "works"
+    },
+    "pack:pdf": {
+      "status": "works"
+    },
+    "pack:image-viewer": {
+      "status": "works"
+    },
+    "pack:archives": {
+      "status": "works"
+    },
+    "pack:multimedia": {
+      "status": "works",
+      "note": "LinPad's own Wayland video output and sound. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "pack:vscode": {
+      "status": "works",
+      "note": "Needs 2-3 GB of memory while running."
+    },
+    "pack:claude-code": {
+      "status": "works"
+    },
+    "pack:gpu": {
+      "status": "works"
+    },
+    "pack:office": {
+      "status": "works",
+      "note": "Very large (about 500 MB with what it needs); the first start takes about a minute under emulation. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "pack:browsers": {
+      "status": "experimental",
+      "note": "Falkon does not start yet; Dillo works."
+    },
+    "pack:dev-extras": {
+      "status": "experimental"
+    },
+    "pack:wine": {
+      "status": "experimental",
+      "note": "Direct3D 10/11/12 games do not run."
+    },
+    "pack:wine-x86": {
+      "status": "experimental",
+      "note": "Needs fast mode for usable speed."
+    },
+    "filezilla": {
+      "status": "works",
+      "note": "Opens natively on Wayland. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "pack:image-editor": {
+      "status": "works",
+      "note": "GIMP 2.10 runs in its own Xwayland. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "inkscape": {
+      "status": "works",
+      "note": "Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "audacity": {
+      "status": "experimental",
+      "note": "Runs with LinPad fixups (iSH has no System V IPC, and a loader deadlock is avoided). The first start shows a plug-in scan; recording and playback were not tested. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "transmission-gtk": {
+      "status": "works",
+      "note": "Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "pack:mail": {
+      "status": "works",
+      "note": "Gecko engine: the first start takes about half a minute. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "gnome-mines": {
+      "status": "works",
+      "note": "Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "aisleriot": {
+      "status": "works",
+      "note": "Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "supertux": {
+      "status": "works",
+      "note": "SDL games are started on Wayland by a Store fixup. Verified 2026-10-03: installed from the Store and opened its window on the release system (CLI emulator)."
+    },
+    "xboard": {
+      "status": "experimental",
+      "note": "Opens through Xwayland, but needs a chess engine (apk add gnuchess) to play."
+    },
+    "pack:camera": {
+      "status": "works",
+      "note": "Live preview and photos; CPU-heavy under emulation. Verified 2026-10-03 by the Linux-apps agent: installed with linpad-apps and opened from its .desktop entry on the release system (CLI emulator)."
+    },
+    "pack:scanner": {
+      "status": "works",
+      "note": "OCR to a searchable PDF, in the terminal. Verified 2026-10-03 by the Linux-apps agent: installed with linpad-apps and opened from its .desktop entry on the release system (CLI emulator)."
+    },
+    "pack:recorder": {
+      "status": "works",
+      "note": "Verified 2026-10-03 by the Linux-apps agent: installed with linpad-apps and opened from its .desktop entry on the release system (CLI emulator)."
+    },
+    "pack:notes": {
+      "status": "works",
+      "note": "Verified 2026-10-03 by the Linux-apps agent: installed with linpad-apps and opened from its .desktop entry on the release system (CLI emulator)."
+    },
+    "pack:calendar-cli": {
+      "status": "works",
+      "note": "Verified 2026-10-03 by the Linux-apps agent: installed with linpad-apps and opened from its .desktop entry on the release system (CLI emulator)."
+    }
+  },
+  "warnSizeMB": 400,
+  "flathub": {
+    "filezilla": "org.filezillaproject.Filezilla",
+    "transmission-gtk": "com.transmissionbt.Transmission",
+    "pack:mail": "org.mozilla.Thunderbird",
+    "pack:mail-light": "org.claws_mail.Claws-Mail",
+    "pack:multimedia": "org.videolan.VLC",
+    "pack:office": "org.libreoffice.LibreOffice",
+    "pack:image-editor": "org.gimp.GIMP",
+    "pack:vscode": "com.visualstudio.code",
+    "pack:pdf": "org.pwmt.zathura",
+    "pack:archives": "org.xfce.xarchiver",
+    "pack:image-viewer": "org.xfce.ristretto",
+    "firefox-esr": "org.mozilla.firefox",
+    "hexchat": "io.github.Hexchat",
+    "pidgin": "im.pidgin.Pidgin",
+    "geany": "org.geany.Geany",
+    "meld": "org.gnome.meld",
+    "sqlitebrowser": "org.sqlitebrowser.sqlitebrowser",
+    "abiword": "com.abisource.AbiWord",
+    "galculator": "com.github.galculator",
+    "handbrake-gtk": "fr.handbrake.ghb",
+    "lmms": "io.lmms.LMMS",
+    "pinta": "com.github.PintaProject.Pinta",
+    "keepassxc": "org.keepassxc.KeePassXC",
+    "gparted": "org.gnome.GParted",
+    "pack:wine": "org.winehq.Wine"
+  },
+  "fixups": {
+    "audacity": "wrap audacity --wayland"
+  }
+}

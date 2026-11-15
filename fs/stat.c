@@ -1,0 +1,249 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <limits.h>
+
+#include "kernel/calls.h"
+#include "kernel/errno.h"
+#include "kernel/fs.h"
+#include "fs/fd.h"
+#include "fs/path.h"
+#include "kernel/task.h"
+
+struct newstat64 stat_convert_newstat64(struct statbuf stat) {
+    struct newstat64 newstat;
+    newstat.dev = stat.dev;
+    newstat.fucked_ino = stat.inode;
+    newstat.ino = stat.inode;
+    newstat.mode = stat.mode;
+    newstat.nlink = stat.nlink;
+    newstat.uid = stat.uid;
+    newstat.gid = stat.gid;
+    newstat.rdev = stat.rdev;
+    newstat.size = stat.size;
+    newstat.blksize = stat.blksize;
+    newstat.blocks = stat.blocks;
+    newstat.atime = stat.atime;
+    newstat.atime_nsec = stat.atime_nsec;
+    newstat.mtime = stat.mtime;
+    newstat.mtime_nsec = stat.mtime_nsec;
+    newstat.ctime = stat.ctime;
+    newstat.ctime_nsec = stat.ctime_nsec;
+    return newstat;
+}
+
+// ARM64 stat conversion (128 bytes struct)
+struct stat_arm64 stat_convert_arm64(struct statbuf stat) {
+    struct stat_arm64 arm64stat = {};
+    arm64stat.dev = stat.dev;
+    arm64stat.ino = stat.inode;
+    arm64stat.mode = stat.mode;
+    arm64stat.nlink = stat.nlink;
+    arm64stat.uid = stat.uid;
+    arm64stat.gid = stat.gid;
+    arm64stat.rdev = stat.rdev;
+    arm64stat.__pad1 = 0;
+    arm64stat.size = stat.size;
+    arm64stat.blksize = stat.blksize;
+    arm64stat.__pad2 = 0;
+    arm64stat.blocks = stat.blocks;
+    arm64stat.atime_ = stat.atime;
+    arm64stat.atime_nsec = stat.atime_nsec;
+    arm64stat.mtime_ = stat.mtime;
+    arm64stat.mtime_nsec = stat.mtime_nsec;
+    arm64stat.ctime_ = stat.ctime;
+    arm64stat.ctime_nsec = stat.ctime_nsec;
+    arm64stat.__unused4 = 0;
+    arm64stat.__unused5 = 0;
+    return arm64stat;
+}
+
+// /proc/<pid>/fd/<n> is a "magic" link: following it reaches the open file
+// itself, even when the link text (socket:[…], pipe:[…], anon_inode:…) is
+// not a path. Returns the stat of that file, or 1 if path is not such a link.
+static int proc_fd_link_stat(const char *path, struct statbuf *stat) {
+    int pid, n, end = 0;
+    if (sscanf(path, "/proc/%d/fd/%d%n", &pid, &n, &end) != 2 || path[end] != '\0')
+        return 1;
+    lock(&pids_lock);
+    struct task *task = pid_get_task(pid);
+    struct fd *fd = NULL;
+    if (task != NULL && !task->exiting && task->files != NULL) {
+        lock(&task->files->lock);
+        fd = fdtable_get(task->files, n);
+        if (fd != NULL)
+            fd_retain(fd);
+        unlock(&task->files->lock);
+    }
+    unlock(&pids_lock);
+    if (fd == NULL)
+        return _ENOENT;
+    memset(stat, 0, sizeof(*stat));
+    int err = fd->mount->fs->fstat(fd, stat);
+    fd_close(fd);
+    return err;
+}
+
+int generic_statat(struct fd *at, const char *path_raw, struct statbuf *stat, bool follow_links) {
+    char path[MAX_PATH];
+    int err = path_normalize(at, path_raw, path, follow_links ? N_SYMLINK_FOLLOW : N_SYMLINK_NOFOLLOW);
+    if (err >= 0) {
+        struct mount *mount = find_mount_and_trim_path(path);
+        memset(stat, 0, sizeof(*stat));
+        err = mount->fs->stat(mount, path, stat);
+        mount_release(mount);
+    }
+    if (err == _ENOENT && follow_links) {
+        // maybe a /proc/<pid>/fd/<n> link to a socket, pipe or anon inode,
+        // whose text (socket:[…]) resolves to nothing
+        char link[MAX_PATH];
+        if (path_normalize(at, path_raw, link, N_SYMLINK_NOFOLLOW) >= 0) {
+            int fd_err = proc_fd_link_stat(link, stat);
+            if (fd_err != 1)
+                return fd_err;
+        }
+    }
+    return err;
+}
+
+// TODO get rid of this and maybe everything else in the file
+static struct fd *at_fd(fd_t f) {
+    if (f == AT_FDCWD_)
+        return AT_PWD;
+    return f_get(f);
+}
+
+static dword_t sys_stat_path(fd_t at_f, addr_t path_addr, addr_t statbuf_addr, bool follow_links) {
+    int err;
+    char path[MAX_PATH];
+    if (user_read_string(path_addr, path, sizeof(path)))
+        return _EFAULT;
+    STRACE("stat(at=%d, path=\"%s\", statbuf=0x%x, follow_links=%d)", at_f, path, statbuf_addr, follow_links);
+    struct fd *at = at_fd(at_f);
+    if (at == NULL)
+        return _EBADF;
+    struct statbuf stat = {};
+    if ((err = generic_statat(at, path, &stat, follow_links)) < 0)
+        return err;
+#ifdef GUEST_ARM64
+    struct stat_arm64 arm64stat = stat_convert_arm64(stat);
+    if (user_put(statbuf_addr, arm64stat))
+        return _EFAULT;
+#else
+    struct newstat64 newstat = stat_convert_newstat64(stat);
+    if (user_put(statbuf_addr, newstat))
+        return _EFAULT;
+#endif
+    return 0;
+}
+
+dword_t sys_stat64(addr_t path_addr, addr_t statbuf_addr) {
+    return sys_stat_path(AT_FDCWD_, path_addr, statbuf_addr, true);
+}
+
+dword_t sys_lstat64(addr_t path_addr, addr_t statbuf_addr) {
+    return sys_stat_path(AT_FDCWD_, path_addr, statbuf_addr, false);
+}
+
+static dword_t stat_put(addr_t statbuf_addr, struct statbuf stat) {
+#ifdef GUEST_ARM64
+    struct stat_arm64 arm64stat = stat_convert_arm64(stat);
+    if (user_put(statbuf_addr, arm64stat))
+        return _EFAULT;
+#else
+    struct newstat64 newstat = stat_convert_newstat64(stat);
+    if (user_put(statbuf_addr, newstat))
+        return _EFAULT;
+#endif
+    return 0;
+}
+
+dword_t sys_fstatat64(fd_t at, addr_t path_addr, addr_t statbuf_addr, dword_t flags) {
+    // An empty path with AT_EMPTY_PATH is the at fd itself: glibc 2.33 and later implement
+    // fstat this way, so without it no glibc program could even load its libraries.
+    if (flags & AT_EMPTY_PATH_) {
+        char first;
+        if (user_get(path_addr, first))
+            return _EFAULT;
+        if (first == '\0') {
+            if (at != AT_FDCWD_)
+                return sys_fstat64(at, statbuf_addr);
+            struct statbuf stat = {};
+            int err = generic_statat(AT_PWD, ".", &stat, true);
+            return err < 0 ? err : stat_put(statbuf_addr, stat);
+        }
+    }
+    return sys_stat_path(at, path_addr, statbuf_addr, !(flags & AT_SYMLINK_NOFOLLOW_));
+}
+
+dword_t sys_fstat64(fd_t fd_no, addr_t statbuf_addr) {
+    STRACE("fstat64(%d, 0x%x)", fd_no, statbuf_addr);
+    struct fd *fd = f_get(fd_no);
+    if (fd == NULL)
+        return _EBADF;
+    struct statbuf stat = {};
+    int err = fd->mount->fs->fstat(fd, &stat);
+    if (err < 0)
+        return err;
+#ifdef GUEST_ARM64
+    struct stat_arm64 arm64stat = stat_convert_arm64(stat);
+    if (user_put(statbuf_addr, arm64stat))
+        return _EFAULT;
+#else
+    struct newstat64 newstat = stat_convert_newstat64(stat);
+    if (user_put(statbuf_addr, newstat))
+        return _EFAULT;
+#endif
+    return 0;
+}
+
+dword_t sys_statx(fd_t at_f, addr_t path_addr, int_t flags, uint_t mask, addr_t statx_addr) {
+    char path[MAX_PATH];
+    if (user_read_string(path_addr, path, sizeof(path)))
+        return _EFAULT;
+    struct fd *at = at_fd(at_f);
+    if (at == NULL)
+        return _EBADF;
+
+    STRACE("statx(at=%d, path=\"%s\", flags=%d, mask=%d, statx=0x%x)", at_f, path, flags, mask, statx_addr);
+
+    struct statbuf stat = {};
+
+    if ((flags & AT_EMPTY_PATH_) && strcmp(path, "") == 0) {
+        struct fd *fd = at;
+        int err = fd->mount->fs->fstat(fd, &stat);
+        if (err < 0)
+            return err;
+    } else {
+        bool follow_links = !(flags & AT_SYMLINK_NOFOLLOW_);
+        int err = generic_statat(at, path, &stat, follow_links);
+        if (err < 0)
+            return err;
+    }
+
+    // for now, ignore the requested mask and just fill in the same fields as stat returns
+    struct statx_ statx = {};
+    statx.mask = STATX_BASIC_STATS_;
+    statx.blksize = stat.blksize;
+    statx.nlink = stat.nlink;
+    statx.uid = stat.uid;
+    statx.gid = stat.gid;
+    statx.mode = stat.mode;
+    statx.ino = stat.inode;
+    statx.size = stat.size;
+    statx.blocks = stat.blocks;
+    statx.atime.sec = stat.atime;
+    statx.atime.nsec = stat.atime_nsec;
+    statx.mtime.sec = stat.mtime;
+    statx.mtime.nsec = stat.mtime_nsec;
+    statx.ctime.sec = stat.ctime;
+    statx.ctime.nsec = stat.ctime_nsec;
+    statx.rdev_major = dev_major(stat.rdev);
+    statx.rdev_minor = dev_minor(stat.rdev);
+    statx.dev_major = dev_major(stat.dev);
+    statx.dev_minor = dev_minor(stat.dev);
+
+    if (user_put(statx_addr, statx))
+        return _EFAULT;
+    return 0;
+}

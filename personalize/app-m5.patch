@@ -1,0 +1,64 @@
+diff --git a/app/AppDelegate.m b/app/AppDelegate.m
+index 0edc1e9..e56fe2c 100644
+--- a/app/AppDelegate.m
++++ b/app/AppDelegate.m
+@@ -259,6 +259,22 @@ static void ApplyMemorySettings(void) {
+         setenv("ISH_OOM_PROTECT", protect.UTF8String, 1);
+ }
+ 
++// Guest memory that jetsam does not charge to the app: anonymous mappings placed in an
++// unlinked sparse file on the app's container (kernel/swapfile.h) are "external" pages,
++// so iPadOS can write them back and drop them. LinPad ships with this off; a device with
++// 6 GB or more can afford the file, and under pressure it turns "close Firefox" into a
++// short stall. ISH_SWAPFILE=pressure maps only while the out-of-memory monitor is below
++// its soft limit. Set LINPAD_NO_SWAPFILE=1 (or delete this function's call) to disable.
++static void ApplySwapFile(void) {
++    if (getenv("LINPAD_NO_SWAPFILE") != NULL)
++        return;
++    uint64_t ram = 0;
++    size_t size = sizeof(ram);
++    if (sysctlbyname("hw.memsize", &ram, &size, NULL, 0) != 0 || ram < (6ull << 30))
++        return;
++    setenv("ISH_SWAPFILE", "pressure", 1);
++}
++
+ // Called on the monitor's thread after it closed a guest process; the desktop shows
+ // the message (DesktopController observes the notification).
+ static void ios_handle_oom_kill(const char *app, const char *message) {
+@@ -1020,6 +1036,7 @@ static void (^backgroundURLSessionCompletion)(void);
+ #if !ISH_LINUX
+     ApplyJITSettings();
+     ApplyMemorySettings();
++    ApplySwapFile();
+     [self startBoot];
+ #else
+     bootError = [self boot];
+diff --git a/app/iSH.entitlements b/app/iSH.entitlements
+index 1cdbf19..80a6c72 100644
+--- a/app/iSH.entitlements
++++ b/app/iSH.entitlements
+@@ -6,6 +6,11 @@
+ 	<array>
+ 		<string>app-usage</string>
+ 	</array>
++	<!-- LinPad M5: lets the emulator keep several GB of guest RAM instead of the
++	     default per-app jetsam ceiling. Requires a provisioning profile that includes
++	     this entitlement; remove the key if signing fails. -->
++	<key>com.apple.developer.kernel.increased-memory-limit</key>
++	<true/>
+ 	<key>com.apple.security.application-groups</key>
+ 	<array>
+ 		<string>$(PRODUCT_APP_GROUP_IDENTIFIER)</string>
+diff --git a/desktop/DesktopKit/Sources/DesktopKit/Core/System/FastMode.swift b/desktop/DesktopKit/Sources/DesktopKit/Core/System/FastMode.swift
+index c38e7b2..c2294a0 100644
+--- a/desktop/DesktopKit/Sources/DesktopKit/Core/System/FastMode.swift
++++ b/desktop/DesktopKit/Sources/DesktopKit/Core/System/FastMode.swift
+@@ -61,7 +61,7 @@ public final class FastModeModel {
+     /// 3 GB available, else less). Read when the JIT starts, so it applies at the next
+     /// launch. Firefox needs about 256 MB; less makes it retranslate all the time.
+     public static let codeCacheKey = "fastMode.codeCacheMB"
+-    public static let codeCacheChoices = [0, 128, 256, 384, 512]
++    public static let codeCacheChoices = [0, 128, 256, 384, 512, 768, 1024]
+     public var codeCacheMB: Int {
+         didSet { UserDefaults.standard.set(codeCacheMB, forKey: Self.codeCacheKey) }
+     }

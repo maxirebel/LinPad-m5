@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>فازبندی اجرایی: قفسهٔ قرنطینه + فایرفاکس پیش‌فرض</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --accent: #0a84ff; --code-bg: #f2f2ef; --table-head: #f6f6f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --fg: #e8e8ea; --muted: #a0a0a6; --line: #2c2c31;
+      --accent: #4da3ff; --code-bg: #1e1e23; --table-head: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 48px 24px 96px; max-width: 920px;
+    background: var(--bg); color: var(--fg);
+    font-family: Vazirmatn, "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
+    font-size: 17px; line-height: 1.95; text-align: right;
+  }
+  h1, h2, h3, h4 { line-height: 1.5; font-weight: 700; letter-spacing: -0.01em; }
+  h1 { font-size: 2rem; margin: 0 0 .4em; }
+  h2 {
+    font-size: 1.5rem; margin: 2.4em 0 .8em; padding-bottom: .35em;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 1.18rem; margin: 1.8em 0 .6em; }
+  h4 { font-size: 1.02rem; margin: 1.4em 0 .4em; color: var(--muted); }
+  p { margin: 0 0 1.05em; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: currentColor; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2.6em 0; }
+  blockquote {
+    margin: 1.6em 0; padding: 1em 1.2em; border-right: 4px solid var(--accent);
+    background: var(--code-bg); border-radius: 0 10px 10px 0; color: var(--muted);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  code, pre, kbd {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    direction: ltr; unicode-bidi: embed; text-align: left;
+  }
+  code { background: var(--code-bg); padding: .12em .35em; border-radius: 5px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); padding: 16px 18px; border-radius: 10px;
+    overflow-x: auto; line-height: 1.65; font-size: .86em; margin: 1.2em 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: .93em;
+    display: block; overflow-x: auto;
+  }
+  th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: right; vertical-align: top; }
+  th { background: var(--table-head); font-weight: 600; white-space: nowrap; }
+  tr:nth-child(even) td { background: color-mix(in srgb, var(--code-bg) 45%, transparent); }
+  ul, ol { margin: 0 0 1.1em; padding-inline-start: 1.6em; }
+  li { margin: .35em 0; }
+  strong { font-weight: 700; }
+  @media print {
+    body { max-width: none; padding: 0; font-size: 11.5pt; }
+    h2 { break-after: avoid; }
+    table, pre, blockquote { break-inside: avoid; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+<h1>فازبندی اجرایی «قفسهٔ قرنطینه» + فایرفاکس به‌عنوان مرورگر پیش‌فرض</h1>
+<blockquote>
+<p><strong>دستگاه:</strong> iPad Pro M5، ۱۲ گیگابایت، iPadOS 27.2 · <strong>LinPad 1.5.0</strong> (Alpine 3.21/musl)
+<strong>این سند:</strong> نقشهٔ اجرا با معیار پذیرش و دروازهٔ تصمیم. هیچ‌چیز هنوز اجرا نشده؛ منتظر دستور شروع.
+<strong>فاز ۰</strong> (تنظیمات + <code>phase0.sh</code>) قبلاً آماده شده است.</p>
+</blockquote>
+<hr>
+<h2>۰. دو تصمیم که ترتیب فازها را تعیین می‌کند</h2>
+<p><strong>تصمیم ۱ — فایرفاکس اول، ابزار بعد.</strong> خواستهٔ شما «حذف ۱۲۸ و نصب نسخهٔ به‌روز به‌عنوان پیش‌فرض» است. به‌جای ساختن دو هفته ابزار و بعد تست، اول فایرفاکس را <strong>دستی</strong> نصب می‌کنیم (فاز ۱). اگر کار کرد، همان مسیر را در ابزار قفسه می‌ریزیم؛ اگر نکرد، قبل از هر هزینه‌ای می‌فهمیم و مسیر جایگزین (Alpine 3.24 با ESR 140 بومی) را انتخاب می‌کنیم. این یک <strong>دروازهٔ تصمیم</strong> است، نه یک ریسک.</p>
+<p><strong>تصمیم ۲ — «پیش‌فرض» سه چیز است، نه یکی.</strong> در این سیستم‌عامل سه مسیر جدا وجود دارد که یک مرورگر می‌تواند «پیش‌فرض» شود، و امروز هیچ‌کدام به فایرفاکس نمی‌رسد:</p>
+<table>
+<thead>
+<tr>
+<th>مسیر</th>
+<th>امروز چه می‌شود</th>
+<th>برای فایرفاکس چه لازم است</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>کلیک روی لینک داخل اپ لینوکسی (<code>ish-open</code>)</td>
+<td><code>firefox-esr</code> را از PATH صدا می‌زند، وگرنه به میزبان برمی‌گردد (<code>wl-bridge/guest/ish-open</code>)</td>
+<td>یک لانچر به نام <code>firefox-esr</code> در <code>/usr/local/bin</code></td>
+</tr>
+<tr>
+<td>درخواست باز کردن URL از سمت میزبان</td>
+<td><code>desktop.linux.urlHandler == &quot;firefox&quot;</code> را می‌خواند (<code>DesktopController+Linux.swift:132</code>)، ولی <strong>هیچ‌جا این کلید نوشته نمی‌شود</strong> → «Quick Preview» باز می‌شود</td>
+<td>یک تغییر یک‌خطی در اپ: <code>!= &quot;preview&quot;</code> یا یک سوییچ در تنظیمات</td>
+</tr>
+<tr>
+<td>«Open With» روی فایل HTML</td>
+<td>از <code>MimeType=</code> فایل <code>.desktop</code></td>
+<td>یک <code>.desktop</code> با <code>text/html;x-scheme-handler/http;…</code></td>
+</tr>
+</tbody></table>
+<p>نکتهٔ مهم: کامنت <code>BrowserApp.swift</code> صریح می‌گوید «مرورگر لینوکسی، مرورگر دسکتاپ است و این نمای WebKit فقط برای پیش‌نمایش سریع است». یعنی <strong>قصد طراح هم فایرفاکس بوده</strong>، فقط کلید پیش‌فرض ست نشده. پس «پیش‌فرض کردن فایرفاکس» یک کار طبیعی است، نه یک هک.</p>
+<hr>
+<h2>۱. نمای کلان فازها</h2>
+<table>
+<thead>
+<tr>
+<th>فاز</th>
+<th>هدف</th>
+<th>خروجی</th>
+<th>تخمین</th>
+<th>وابسته به</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>۰</strong> ✅ انجام‌شده</td>
+<td>تنظیم بدون build</td>
+<td><code>phase0.sh</code> + پروفایل ۱۲GB</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>۱</strong></td>
+<td>اثبات فایرفاکس ۱۵۳.۷ روی این هسته</td>
+<td>نصب دستی در <code>/opt</code> + سنجش</td>
+<td>۱–۲ روز</td>
+<td>فاز ۰</td>
+</tr>
+<tr>
+<td><strong>۲</strong></td>
+<td>هستهٔ قفسه (runtime + overlay + دفتر ثبت)</td>
+<td><code>linpad-shelf</code></td>
+<td>۳–۵ روز</td>
+<td>فاز ۱ موفق</td>
+</tr>
+<tr>
+<td><strong>۳</strong></td>
+<td>فایرفاکس پیش‌فرض و حذف کامل ۱۲۸</td>
+<td>پچ یک‌خطی + مهاجرت</td>
+<td>۲ روز</td>
+<td>فاز ۲</td>
+</tr>
+<tr>
+<td><strong>۴</strong></td>
+<td>استور: نصب از لینک + قفسهٔ دبیان</td>
+<td>UI</td>
+<td>۴–۶ روز</td>
+<td>فاز ۲</td>
+</tr>
+<tr>
+<td><strong>۵</strong></td>
+<td>نگهداری: آپدیت/برگشت/تعمیر + Alpine 3.24</td>
+<td><code>update</code>/<code>rollback</code></td>
+<td>۱ هفته</td>
+<td>فاز ۴</td>
+</tr>
+</tbody></table>
+<p>ترتیب: ۱ → ۲ → ۳ → ۴ → ۵. فاز ۳ عمداً بعد از ۲ است تا فایرفاکس از همان روز اول «قفسه‌ای» باشد، نه یک استثنای دستی.</p>
+<hr>
+<h2>۲. فاز ۱ — پایلوت فایرفاکس (دروازهٔ تصمیم)</h2>
+<h3>از کجا می‌آییم</h3>
+<table>
+<thead>
+<tr>
+<th>نسخه</th>
+<th>منبع</th>
+<th>حجم</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>firefox-esr 128.14.0</code> (نصب‌شده، پشتیبانی تمام‌شده)</td>
+<td>Alpine 3.21 community</td>
+<td>۷۱MB بسته</td>
+</tr>
+<tr>
+<td><code>firefox 136.0.4</code></td>
+<td>همان مخزن، نصب‌نشده</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>firefox-esr 140.12.0</code> / <code>firefox 151.0.3</code></td>
+<td>Alpine 3.24 (نیازمند build روت‌فاس)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong><code>firefox-esr 153.7.0esr</code></strong></td>
+<td><strong>دبیان trixie-security، arm64</strong></td>
+<td><strong>۷۱٫۷MB بسته / ۲۸۱MB نصب</strong></td>
+</tr>
+</tbody></table>
+<h3>هدف</h3>
+<p>بدون ساختن هیچ ابزاری، ثابت کنیم نسخهٔ <strong>۱۵۳.۷.۰esr</strong> (دبیان trixie-security، بستهٔ arm64، ۷۱٫۷ مگابایت، نصب ۲۸۱ مگابایت) روی این هسته پایدار و قابل استفاده است.</p>
+<blockquote>
+<p><strong>وضعیت: پیاده‌سازی شد.</strong> فایل <code>personalize/phase1-firefox.sh</code> کل این فاز را روی خود آیپد انجام می‌دهد (بدون مک): حذف ۱۲۸، خواندن آخرین نسخه از ایندکس امنیتی دبیان، بررسی SHA-256، نصب در <code>/opt</code>، پروفایل تازه در <code>~/.mozilla-firefox-esr153</code>، لانچر، آیکون، و <code>--undo</code> برای برگشت.</p>
+</blockquote>
+<h3>گام‌ها</h3>
+<p>۱. <strong>بکاپ پروفایل</strong> — <code>cp -a /root/.mozilla /root/.mozilla-backup-$(date +%F)</code> (مهاجرت ۱۲۸ → ۱۵۳ یک‌طرفه است).
+۲. <strong>حذف نسخهٔ قدیم</strong> — طبق چک‌لیست پیوست الف.
+۳. <strong>ساخت رانتایم موقت</strong> — جزیرهٔ glibc موجود یا <code>linpad-get island</code>؛ برای پایلوت، همان <code>/usr/lib/aarch64-linux-gnu</code> کافی است.
+۴. <strong>استخراج بسته در <code>/opt/firefox-esr-pilot</code></strong> — <code>dpkg-deb -x</code> (نیاز به <code>apk add dpkg</code>) یا <code>bsdtar</code>.
+۵. <strong>افزودن وابستگی‌های گمشده</strong> — با <code>ld-linux --list</code> و افزودن بسته‌های دبیان (<code>libevent-2.1-7t64</code>، <code>libvpx9</code>، <code>libx11-xcb1</code>، <code>libxcb-shm0</code>، <code>libcairo-gobject2</code>، <code>libffi8</code>، و برای ویدیو <code>libavcodec61</code>).
+۶. <strong>لانچر موقت</strong> — فایل <code>/usr/local/bin/firefox-esr</code> با loader صریح و پروفایل بهینه (پیوست ب).
+۷. <strong>تست</strong> — ۱۰ سایت، ۵ تب، ویدیوی H.264، فونت فارسی، دانلود فایل، درگ‌اند‌دراپ، کیبورد.</p>
+<h3>معیار پذیرش (اگر هرکدام رد شد، دروازه بسته است)</h3>
+<table>
+<thead>
+<tr>
+<th>معیار</th>
+<th>حد قبول</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>نسخه در <code>about:support</code></td>
+<td>153.7</td>
+</tr>
+<tr>
+<td>۵ تب هم‌زمان، ۱۵ دقیقه</td>
+<td>بدون کرش تب، بدون بسته‌شدن اپ</td>
+</tr>
+<tr>
+<td>ویدیوی H.264</td>
+<td>پخش با صدا</td>
+</tr>
+<tr>
+<td>فونت فارسی</td>
+<td>درست، بدون مربع</td>
+</tr>
+<tr>
+<td>زمان تا پنجره (pcache فعلی)</td>
+<td>≤ ۲۵ ثانیه</td>
+</tr>
+<tr>
+<td>رم بعد از ۵ تب (<code>/proc/ish/memory</code>)</td>
+<td>≤ ۲٫۵ گیگابایت footprint</td>
+</tr>
+<tr>
+<td>حذف ۱۲۸</td>
+<td>هیچ فایل باقی‌نمانده</td>
+</tr>
+</tbody></table>
+<h3>اگر شکست خورد</h3>
+<p>مسیر جایگزین فاز ۱′: مهاجرت rootfs به Alpine 3.24 و استفاده از <strong>ESR 140.12 بومی</strong> (بدون جزیره، بدون sandbox hack، سریع‌تر). در آن حالت فاز ۲ به بعد هم ساده‌تر می‌شود ولی «جدیدترین نسخه» (۱۵۳) از دست می‌رود.</p>
+<hr>
+<h2>۳. فاز ۲ — هستهٔ قفسه</h2>
+<blockquote>
+<p><strong>وضعیت: پیاده‌سازی شد (نسخهٔ ۱).</strong> فایل <code>personalize/linpad-shelf</code>. یک تفاوت آگاهانه با طرح اولیه: در v1 <strong>یک runtime مشترک و افزودنی</strong> داریم (نه چند نسل موازی). دلیل: مدیریت نسل‌ها بیشترین ریسک باگ را داشت و سود عملی‌اش کم بود؛ هر اپ همچنان به‌طور کامل جدا و قابل حذف است. نسل‌بندی نسخه‌دار برای فاز ۲٫۵ می‌ماند.</p>
+</blockquote>
+<h3>قرارداد (Contract)</h3>
+<pre><code>/usr/lib/linpad-shelf/runtime/            رانتایم مشترک (v1: افزودنی، یک نسخه)
+/opt/linpad-shelf/&lt;name&gt;/root/            پیلود اپ، تنها جای نوشتن
+/usr/local/bin/&lt;name&gt;                     لانچر تولیدشده (تنها فایل بیرون از /opt)
+/usr/share/applications/&lt;name&gt;.desktop    ورودی دسکتاپ
+/var/lib/linpad-shelf/&lt;name&gt;/             دفتر ثبت: meta، files، dirs، extras
+</code></pre>
+<h3>قواعد سخت</h3>
+<ul>
+<li><strong>صفر نوشتن در <code>/usr/lib</code>، <code>/lib</code>، <code>/usr/bin</code>، <code>/usr/share</code></strong> مگر فایل‌های تولیدی خودمان.</li>
+<li>اجرا با loader صریح و <code>--library-path</code> رانتایم — بدون symlink گلوبال، بدون <code>LD_LIBRARY_PATH</code> ارثی.</li>
+<li>داده‌های اپ با <code>XDG_DATA_DIRS</code> از overlay خوانده می‌شوند، نه با کپی در <code>/</code>.</li>
+<li>حذف = پاک‌کردن پوشه + سه فایل ثبت‌شده. هیچ وابستگی‌ای جا نمی‌ماند (رانتایم مشترک می‌ماند).</li>
+<li><strong>seed از جزیرهٔ موجود:</strong> اگر <code>/usr/lib/aarch64-linux-gnu</code> از قبل هست (VS Code/Wine)، رانتایم از همان کپی می‌شود و دانلود دوباره لازم نیست؛ بعد از موفقیت فاز ۲ می‌توان جزیرهٔ گلوبال را بازنشسته کرد تا نسخهٔ تکراری روی دیسک نماند.</li>
+</ul>
+<h3>معیار پذیرش</h3>
+<table>
+<thead>
+<tr>
+<th>معیار</th>
+<th>حد قبول</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>نصب سه اپ مختلف</td>
+<td>بدون خطا، بدون لمس مسیر سیستمی</td>
+</tr>
+<tr>
+<td>حذف</td>
+<td><code>diff</code> فهرست فایل‌ها قبل/بعد = صفر</td>
+</tr>
+<tr>
+<td>بوت و CPU بی‌کار</td>
+<td>تغییر &lt; ۲٪ نسبت به فاز ۰</td>
+</tr>
+<tr>
+<td>اپ خراب (deb بدساخته)</td>
+<td>فقط overlay خودش خراب می‌شود، بقیه سالم</td>
+</tr>
+<tr>
+<td>حجم</td>
+<td>≤ حجم نصب‌شدهٔ <code>.deb</code> + ۱۰٪</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>۴. فاز ۳ — فایرفاکس پیش‌فرض + حذف کامل قدیمی</h2>
+<blockquote>
+<p><strong>وضعیت: پیاده‌سازی شد.</strong> دستور <code>linpad-shelf migrate-firefox</code>. اگر فاز ۱ انجام شده باشد، همان نصب را بدون دانلود دوباره به قفسه منتقل می‌کند؛ وگرنه آخرین نسخه را از ایندکس امنیتی دبیان می‌گیرد. نسخهٔ ۱۲۸ و باقی‌مانده‌هایش حذف می‌شوند، لانچر همیشه <code>firefox-esr</code> است، و پروفایل تازه با prefs بهینه ساخته می‌شود. تنها اهرمی که بدون build ممکن نیست، کلید <code>desktop.linux.urlHandler</code> است (بخش ۰).</p>
+</blockquote>
+<h3>سه اهرم «پیش‌فرض شدن»</h3>
+<p>۱. <strong>لانچر هم‌نام + جایگزینی <code>ish-open</code>:</strong> فایل <code>/usr/local/bin/firefox-esr</code> و یک <code>ish-open</code> نازک که مستقیم همان را صدا می‌زند (نسخهٔ اصلی بکاپ و با حذف اپ برگردانده می‌شود). این کار مسیر «کلیک روی لینک در اپ‌های لینوکسی» را کامل می‌کند، بدون نیاز به build.
+۲. <strong>پچ یک‌خطی اپ:</strong> در <code>DesktopController+Linux.swift:132</code> شرط <code>== &quot;firefox&quot;</code> به <code>!= &quot;preview&quot;</code> تغییر کند، یا یک سوییچ «Open links in Firefox» در تنظیمات اضافه شود. این تنها تغییر سمت اپ در کل این فازبندی است و بدون آن، لینک‌های سمت میزبان همیشه در Quick Preview باز می‌شوند.
+۳. <strong>ورودی دسکتاپ:</strong> <code>.desktop</code> با <code>MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;</code> تا در «Open With» اول بیاید.</p>
+<h3>حذف کامل ۱۲۸ — تعریف «کامل»</h3>
+<p>حذف تنها با <code>apk del</code> تمام نمی‌شود؛ سه جای دیگر هم باید تمیز شود (جزئیات دستوری در پیوست الف):</p>
+<ul>
+<li>بستهٔ <code>firefox-esr</code> و فایل‌هایش،</li>
+<li>پروفایل قدیمی (بکاپ می‌شود، حذف نمی‌شود مگر بعد از مهاجرت موفق)،</li>
+<li>خط <code>firefox-esr</code> در <code>/etc/ishwl/app-scale</code> (باید بماند، چون لانچر جدید هم همان نام را دارد).</li>
+</ul>
+<h3>معیار پذیرش</h3>
+<ul>
+<li><code>apk info -e firefox-esr</code> → خروجی غیرصفر (نیست).</li>
+<li><code>ls /usr/lib/firefox-esr</code> → وجود ندارد.</li>
+<li><code>which firefox-esr</code> → <code>/usr/local/bin/firefox-esr</code>.</li>
+<li><code>firefox-esr --version</code> → 153.7.</li>
+<li>کلیک روی لینک از foot → پنجرهٔ فایرفاکس، نه Quick Preview.</li>
+<li>بوت و CPU بی‌کار: بدون تغییر محسوس.</li>
+</ul>
+<hr>
+<h2>۵. فاز ۴ — استور</h2>
+<blockquote>
+<p><strong>وضعیت: نیمه‌پیاده‌سازی.</strong> سمت مهمان کامل است (<code>linpad-shelf list --json</code>). سمت اپ نوشته شد (<code>Apps/Shelf/ShelfApp.swift</code> + ثبت در <code>BuiltinApps</code>/<code>AppID</code>) ولی <strong>کامپایل نشده</strong>، چون این ماشین مک/Xcode ندارد. تا build نشود، این قابلیت فقط از ترمینال در دسترس است.</p>
+</blockquote>
+<ul>
+<li>کادر «نصب از لینک»: تشخیص فرمت، کارت تأیید (نام، نسخه، حجم، مصرف رم، «تست‌شده روی M5»)، نصب با پیشرفت.</li>
+<li>قفسهٔ «Debian» با ۲۰ اپ تست‌شده و برچسب RAM class.</li>
+<li>حذف و بازکردن از همان کارت.</li>
+<li>معیار پذیرش: ۳ کلیک، بدون ترمینال؛ حذف بدون باقی‌مانده.</li>
+</ul>
+<hr>
+<h2>۶. فاز ۵ — نگهداری</h2>
+<ul>
+<li><code>linpad-shelf update</code>: مقایسه با ایندکس دبیان (main + security + updates)، دانلود، تعویض کنار‌به‌کنار، نگه‌داشتن نسخهٔ قبلی برای ۷ روز.</li>
+<li><code>linpad-shelf repair</code>: بعد از آپدیت system image، اپ‌هایی که رانتایمشان قدیمی شده را بازسازی کند.</li>
+<li>اختیاری: Alpine 3.24 با معیار A/B (اگر پنج عدد فاز ۰ بدتر شد، برنمی‌گردیم).</li>
+</ul>
+<hr>
+<h2>پیوست الف — چک‌لیست حذف کامل فایرفاکس ۱۲۸</h2>
+<pre><code class="language-sh"># ۰. بکاپ پروفایل (اجباری)
+cp -a /root/.mozilla /root/.mozilla-backup-$(date +%F)
+du -sh /root/.mozilla-backup-*
+
+# ۱. چه چیزی نصب است؟
+apk info -e firefox-esr &amp;&amp; apk info -v firefox-esr
+apk info -L firefox-esr | head -20          # فایل‌های بسته
+
+# ۲. حذف بسته
+apk del firefox-esr
+
+# ۳. باقی‌مانده‌ها را چک کنید (باید خالی باشد)
+ls -d /usr/lib/firefox-esr 2&gt;/dev/null || echo &quot;lib: clean&quot;
+ls /usr/share/applications/firefox* 2&gt;/dev/null || echo &quot;desktop: clean&quot;
+command -v firefox-esr || echo &quot;path: clean&quot;
+
+# ۴. مواردی که عمداً می‌مانند
+grep firefox /etc/ishwl/app-scale           # خط مقیاس: باید بماند
+ls /root/.mozilla                            # پروفایل: باید بماند (برای مهاجرت)
+
+# ۵. بعد از نصب نسخهٔ جدید
+firefox-esr --version
+grep -m1 &#39;&quot;version&quot;&#39; /opt/firefox-esr-pilot/usr/lib/firefox-esr/application.ini
+</code></pre>
+<p>نکته: اگر روزی خواستید برگردید، <code>apk add firefox-esr</code> نسخهٔ ۱۲۸ را برمی‌گرداند (تا وقتی مخزن 3.21 در دسترس است) — پس این عملیات برگشت‌پذیر است.</p>
+<hr>
+<h2>پیوست ب — پروفایل «به‌روز اما بهینه» برای ۱۵۳.۷</h2>
+<p>این مقادیر باید <strong>داخل overlay خود فایرفاکس</strong> نوشته شوند (نه در <code>/usr/lib/firefox-esr</code>)، تا با حذف اپ، حذف شوند.</p>
+<table>
+<thead>
+<tr>
+<th>کلید</th>
+<th>مقدار</th>
+<th>چرا</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dom.ipc.processCount</code></td>
+<td>۱</td>
+<td>هر پروسهٔ اضافه یک ترجمهٔ کامل <code>libxul</code> می‌خواهد</td>
+</tr>
+<tr>
+<td><code>fission.autostart</code></td>
+<td>false</td>
+<td>همان دلیل</td>
+</tr>
+<tr>
+<td><code>security.sandbox.content.level</code></td>
+<td>۰</td>
+<td>هسته seccomp ندارد (<code>kernel/misc.c</code>) → وگرنه تب‌ها کرش می‌کنند</td>
+</tr>
+<tr>
+<td><code>media.mediasource.webm.enabled</code></td>
+<td>false</td>
+<td>H.264 ارزان‌تر از VP9/AV1 روی شبیه‌ساز</td>
+</tr>
+<tr>
+<td><code>media.av1.enabled</code></td>
+<td>false</td>
+<td>همان</td>
+</tr>
+<tr>
+<td><code>layout.css.stylo-threads</code></td>
+<td>۲</td>
+<td>هر ترد ~۱٫۳MB هزینهٔ میزبان</td>
+</tr>
+<tr>
+<td><code>javascript.options.mem.gc_max_helper_threads</code></td>
+<td>۲</td>
+<td>همان</td>
+</tr>
+<tr>
+<td><code>browser.cache.memory.capacity</code></td>
+<td>۶۵۵۳۶</td>
+<td>۱۲ گیگابایت رم</td>
+</tr>
+<tr>
+<td><code>image.mem.surfacecache.max_size_kb</code></td>
+<td>۲۶۲۱۴۴</td>
+<td>همان</td>
+</tr>
+<tr>
+<td><code>browser.tabs.unloadOnLowMemory</code></td>
+<td>true</td>
+<td>محافظ در فشار حافظه</td>
+</tr>
+<tr>
+<td><code>toolkit.cosmeticAnimations.enabled</code></td>
+<td>false</td>
+<td>هر انیمیشن یک بازترسیم نرم‌افزاری</td>
+</tr>
+<tr>
+<td><code>browser.sessionstore.interval</code></td>
+<td>۱۵۰۰۰</td>
+<td>iPadOS اپ را بی‌خبر می‌کشد</td>
+</tr>
+</tbody></table>
+<p>به‌علاوه در محیط اجرا:</p>
+<ul>
+<li><code>MALLOC_ARENA_MAX=6</code> (از <code>m5-tune.sh</code>)</li>
+<li><code>MOZ_ENABLE_WAYLAND=1</code></li>
+<li><code>MOZ_DISABLE_CONTENT_SANDBOX=1</code> (پشتیبانِ pref بالا)</li>
+</ul>
+<p>و از سمت اپ (کار «موتور» در گزارش فازها، جدا از این سند): <code>pcache</code> ۲۵۶ و <code>JIT arena</code> ۵۱۲ — این‌ها بیشترین اثر را روی «روانی» دارند و بدون build نمی‌شوند.</p>
+<hr>
+<h2>پیوست ج — روش سنجش</h2>
+<p>از همان <code>phase0.sh</code> استفاده کنید: قبل از فاز ۱ یک <code>--before</code>، بعد از نصب <code>--after</code>. عدد کلیدی «بار دوم فایرفاکس» است، چون pcache تازه بعد از یک اجرا گرم می‌شود.</p>
+<hr>
+<h2>ریسک‌ها و دروازه‌ها</h2>
+<table>
+<thead>
+<tr>
+<th>ریسک</th>
+<th>دروازه</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>فایرفاکس ۱۵۳ روی این هسته کرش کند</td>
+<td>معیار پذیرش فاز ۱ رد شود → مسیر جایگزین: Alpine 3.24 با ESR 140 بومی</td>
+</tr>
+<tr>
+<td>وابستگی‌های دبیان تمام نشوند</td>
+<td>اگر بیش از ۸ بستهٔ گمشده بود، فاز ۱ شکست‌خورده حساب می‌شود</td>
+</tr>
+<tr>
+<td>اپ‌های Electron سیستم را کند کنند</td>
+<td>برچسب RAM class در استور + هشدار نصب</td>
+</tr>
+<tr>
+<td>آپدیت دبیان اپ را بشکند</td>
+<td>نسخهٔ قبلی ۷ روز می‌ماند + <code>rollback</code></td>
+</tr>
+<tr>
+<td>Alpine 3.21 EOL</td>
+<td>فاز ۵، با معیار A/B</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>آنچه برای شروع لازم است</h2>
+<p>۱. <del>تأیید شروع فاز ۱</del> — انجام شد: <code>personalize/phase1-firefox.sh</code>.
+۲. <del>تصمیم دربارهٔ پروفایل</del> — انجام شد: <strong>پروفایل تازه</strong> (بدون مهاجرت؛ پروفایل قدیمی دست‌نخورده می‌ماند).
+۳. چون مک در دسترس نیست، پچ یک‌خطی <code>urlHandler</code> فعلاً کنار گذاشته می‌شود؛ «پیش‌فرض» از دو مسیر دیگر (لینک داخل اپ‌های لینوکسی و آیکون Applications) کار می‌کند.</p>
+
+</body>
+</html>

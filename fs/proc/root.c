@@ -1,0 +1,237 @@
+#include "kernel/oom.h"
+#include <sys/stat.h>
+#include <inttypes.h>
+#include <string.h>
+#include "kernel/calls.h"
+#include "fs/proc.h"
+#include "platform/platform.h"
+#include "kernel/ipc.h"
+#ifdef GUEST_ARM64
+#include "asbestos/guest-arm64/hwcap.h"
+#endif
+
+static int proc_show_version(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    struct uname uts;
+    do_uname(&uts);
+    proc_printf(buf, "%s version %s %s\n", uts.system, uts.release, uts.version);
+    return 0;
+}
+
+static int proc_show_stat(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    struct cpu_usage usage = get_cpu_usage();
+    proc_printf(buf, "cpu  %"PRIu64" %"PRIu64" %"PRIu64" %"PRIu64" 0 0 0 0 0 0\n", usage.user_ticks, usage.nice_ticks, usage.system_ticks, usage.idle_ticks);
+    // Per-CPU lines: libuv (os.cpus(), and so Node's worker pools) and
+    // others count CPUs here. The host gives one total, split evenly.
+    unsigned cpus = sysconf(_SC_NPROCESSORS_ONLN);
+    if (cpus < 1)
+        cpus = 1;
+    for (unsigned i = 0; i < cpus; i++)
+        proc_printf(buf, "cpu%u %"PRIu64" %"PRIu64" %"PRIu64" %"PRIu64" 0 0 0 0 0 0\n", i,
+                usage.user_ticks / cpus, usage.nice_ticks / cpus, usage.system_ticks / cpus, usage.idle_ticks / cpus);
+
+    // calculate btime (boot time in seconds since epoch) by subtracting uptime from current time
+    struct uptime_info uptime = get_uptime();
+    struct timespec uptime_ts = {.tv_sec = uptime.uptime_ticks / 100, .tv_nsec = (uptime.uptime_ticks % 100) * 10000000};
+    struct timespec boot_time = timespec_subtract(timespec_now(CLOCK_REALTIME), uptime_ts);
+    proc_printf(buf, "btime %ld\n", boot_time.tv_sec);
+
+    return 0;
+}
+
+static int proc_show_cpuinfo(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    unsigned cpus = sysconf(_SC_NPROCESSORS_ONLN);
+    for (unsigned i = 0; i < cpus; i++) {
+        proc_printf(buf, "processor\t: %u\n", i);
+#ifdef GUEST_ARM64
+        // ARM64 format
+        proc_printf(buf, "BogoMIPS\t: 48.00\n");
+        char features[512];
+        arm64_guest_cpu_features(features, sizeof(features));
+        proc_printf(buf, "Features\t: %s\n", features);
+        proc_printf(buf, "CPU implementer\t: 0x00\n");
+        proc_printf(buf, "CPU architecture: 8\n");
+        proc_printf(buf, "CPU variant\t: 0x0\n");
+        proc_printf(buf, "CPU part\t: 0x000\n");
+        proc_printf(buf, "CPU revision\t: 0\n");
+#else
+        // x86 format
+        proc_printf(buf, "vendor_id\t: iSH\n");
+#endif
+        proc_printf(buf, "\n");
+    }
+    return 0;
+}
+
+static void show_kb(struct proc_data *buf, const char *name, uint64_t value) {
+    proc_printf(buf, "%s%8"PRIu64" kB\n", name, value / 1024);
+}
+
+static int proc_show_meminfo(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    // Real numbers: memory-pressure logic in browsers (WebKit's
+    // MemoryPressureMonitor, Firefox) and allocators size themselves from
+    // MemTotal/MemAvailable. On iOS MemAvailable is this app's remaining
+    // jetsam headroom, which is what actually limits the guest.
+    struct mem_usage usage = get_mem_usage();
+    uint64_t available = usage.available;
+    uint64_t cached = usage.cached < available ? usage.cached : available;
+    uint64_t free = usage.free < available ? usage.free : available;
+    show_kb(buf, "MemTotal:       ", usage.total);
+    show_kb(buf, "MemFree:        ", free);
+    show_kb(buf, "MemAvailable:   ", available);
+    show_kb(buf, "Buffers:        ", 0);
+    show_kb(buf, "Cached:         ", cached);
+    show_kb(buf, "SwapCached:     ", 0);
+    show_kb(buf, "Active:         ", usage.active);
+    show_kb(buf, "Inactive:       ", usage.inactive);
+    show_kb(buf, "Active(anon):   ", usage.active);
+    show_kb(buf, "Inactive(anon): ", 0);
+    show_kb(buf, "Active(file):   ", 0);
+    show_kb(buf, "Inactive(file): ", cached);
+    show_kb(buf, "SwapTotal:      ", 0);
+    show_kb(buf, "SwapFree:       ", 0);
+    show_kb(buf, "Dirty:          ", 0);
+    show_kb(buf, "Writeback:      ", 0);
+    show_kb(buf, "AnonPages:      ", usage.active);
+    show_kb(buf, "Mapped:         ", 0);
+    show_kb(buf, "Shmem:          ", 0);
+    show_kb(buf, "Slab:           ", 0);
+    show_kb(buf, "SReclaimable:   ", 0);
+    show_kb(buf, "SUnreclaim:     ", 0);
+    show_kb(buf, "CommitLimit:    ", usage.total);
+    return 0;
+}
+
+// Minimal zoneinfo: WebKit's MemoryPressureMonitor reads the low watermark.
+static int proc_show_zoneinfo(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    struct mem_usage usage = get_mem_usage();
+    uint64_t page = 4096;
+    uint64_t total = usage.total / page;
+    uint64_t low = total / 200; // ~0.5%, in line with Linux defaults
+    proc_printf(buf, "Node 0, zone   Normal\n");
+    proc_printf(buf, "  pages free     %"PRIu64"\n", usage.free / page);
+    proc_printf(buf, "        min      %"PRIu64"\n", low * 4 / 5);
+    proc_printf(buf, "        low      %"PRIu64"\n", low);
+    proc_printf(buf, "        high     %"PRIu64"\n", low * 6 / 5);
+    proc_printf(buf, "        spanned  %"PRIu64"\n", total);
+    proc_printf(buf, "        present  %"PRIu64"\n", total);
+    proc_printf(buf, "        managed  %"PRIu64"\n", total);
+    return 0;
+}
+
+static int proc_show_uptime(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    struct uptime_info uptime_info = get_uptime();
+    unsigned long uptime = uptime_info.uptime_ticks;
+    proc_printf(buf, "%lu.%lu %lu.%lu\n", uptime / 100, uptime % 100, uptime / 100, uptime % 100);
+    return 0;
+}
+
+static int proc_readlink_self(struct proc_entry *UNUSED(entry), char *buf) {
+    sprintf(buf, "%d/", current->pid);
+    return 0;
+}
+
+static void proc_print_escaped(struct proc_data *buf, const char *str) {
+    for (size_t i = 0; str[i]; i++) {
+        switch (str[i]) {
+            case '\t': case ' ': case '\\':
+                proc_printf(buf, "\\%03o", str[i]);
+                break;
+            default:
+                proc_printf(buf, "%c", str[i]);
+        }
+    }
+}
+
+#define proc_printf_comma(buf, at_start, format, ...) do { \
+    proc_printf((buf), "%s" format, *(at_start) ? "" : ",", ##__VA_ARGS__); \
+    *(at_start) = false; \
+} while (0)
+
+static int proc_show_mounts(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    struct mount *mount;
+    list_for_each_entry(&mounts, mount, mounts) {
+        const char *point = mount->point;
+        if (point[0] == '\0')
+            point = "/";
+
+        proc_print_escaped(buf, mount->source);
+        proc_printf(buf, " ");
+        proc_print_escaped(buf, point);
+        proc_printf(buf, " %s ", mount->fs->name);
+        bool at_start = true;
+        proc_printf_comma(buf, &at_start, "%s", mount->flags & MS_READONLY_ ? "ro" : "rw");
+        if (mount->flags & MS_NOSUID_)
+            proc_printf_comma(buf, &at_start, "nosuid");
+        if (mount->flags & MS_NODEV_)
+            proc_printf_comma(buf, &at_start, "nodev");
+        if (mount->flags & MS_NOEXEC_)
+            proc_printf_comma(buf, &at_start, "noexec");
+        if (strcmp(mount->info, "") != 0)
+            proc_printf_comma(buf, &at_start, "%s", mount->info);
+        proc_printf(buf, " 0 0\n");
+    };
+    return 0;
+}
+
+// Forward declaration for /proc/net
+extern struct proc_children proc_net_children;
+extern struct proc_children proc_sys_children;
+
+static struct proc_children proc_sysvipc_children = PROC_CHILDREN({
+    {"msg", .show = proc_sysvipc_msg},
+    {"sem", .show = proc_sysvipc_sem},
+    {"shm", .show = proc_sysvipc_shm},
+});
+
+static int proc_show_pressure_memory(struct proc_entry *UNUSED(entry), struct proc_data *buf) {
+    oom_show_pressure(buf);
+    return 0;
+}
+
+static struct proc_children proc_pressure_children = PROC_CHILDREN({
+    {"memory", .show = proc_show_pressure_memory},
+});
+
+// in alphabetical order
+struct proc_dir_entry proc_root_entries[] = {
+    {"cpuinfo", .show = proc_show_cpuinfo},
+    {"ish", S_IFDIR, .children = &proc_ish_children},
+    {"meminfo", .show = proc_show_meminfo},
+    {"mounts", .show = proc_show_mounts},
+    {"net", S_IFDIR, .children = &proc_net_children},
+    {"pressure", S_IFDIR, .children = &proc_pressure_children},
+    {"self", S_IFLNK, .readlink = proc_readlink_self},
+    {"stat", .show = proc_show_stat},
+    {"sys", S_IFDIR, .children = &proc_sys_children},
+    {"sysvipc", S_IFDIR, .children = &proc_sysvipc_children},
+    {"uptime", .show = proc_show_uptime},
+    {"version", .show = proc_show_version},
+    {"zoneinfo", .show = proc_show_zoneinfo},
+};
+#define PROC_ROOT_LEN sizeof(proc_root_entries)/sizeof(proc_root_entries[0])
+
+static bool proc_root_readdir(struct proc_entry *UNUSED(entry), unsigned long *index, struct proc_entry *next_entry) {
+    if (*index < PROC_ROOT_LEN) {
+        *next_entry = (struct proc_entry) {&proc_root_entries[*index], *index, NULL, NULL, 0, 0};
+        (*index)++;
+        return true;
+    }
+
+    pid_t_ pid = *index - PROC_ROOT_LEN;
+    if (pid <= MAX_PID) {
+        lock(&pids_lock);
+        do {
+            pid++;
+        } while (pid <= MAX_PID && pid_get_task(pid) == NULL);
+        unlock(&pids_lock);
+        if (pid > MAX_PID)
+            return false;
+        *next_entry = (struct proc_entry) {&proc_pid, .pid = pid};
+        *index = pid + PROC_ROOT_LEN;
+        return true;
+    }
+
+    return false;
+}
+
+struct proc_dir_entry proc_root = {NULL, S_IFDIR, .readdir = proc_root_readdir};

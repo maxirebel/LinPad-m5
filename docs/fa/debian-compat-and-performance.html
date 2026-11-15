@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سازگاری با اپ‌های دبیان و اجرای روان — پیشنهاد تغییرات</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --accent: #0a84ff; --code-bg: #f2f2ef; --table-head: #f6f6f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --fg: #e8e8ea; --muted: #a0a0a6; --line: #2c2c31;
+      --accent: #4da3ff; --code-bg: #1e1e23; --table-head: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 48px 24px 96px; max-width: 920px;
+    background: var(--bg); color: var(--fg);
+    font-family: Vazirmatn, "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
+    font-size: 17px; line-height: 1.95; text-align: right;
+  }
+  h1, h2, h3, h4 { line-height: 1.5; font-weight: 700; letter-spacing: -0.01em; }
+  h1 { font-size: 2rem; margin: 0 0 .4em; }
+  h2 {
+    font-size: 1.5rem; margin: 2.4em 0 .8em; padding-bottom: .35em;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 1.18rem; margin: 1.8em 0 .6em; }
+  h4 { font-size: 1.02rem; margin: 1.4em 0 .4em; color: var(--muted); }
+  p { margin: 0 0 1.05em; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: currentColor; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2.6em 0; }
+  blockquote {
+    margin: 1.6em 0; padding: 1em 1.2em; border-right: 4px solid var(--accent);
+    background: var(--code-bg); border-radius: 0 10px 10px 0; color: var(--muted);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  code, pre, kbd {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    direction: ltr; unicode-bidi: embed; text-align: left;
+  }
+  code { background: var(--code-bg); padding: .12em .35em; border-radius: 5px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); padding: 16px 18px; border-radius: 10px;
+    overflow-x: auto; line-height: 1.65; font-size: .86em; margin: 1.2em 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: .93em;
+    display: block; overflow-x: auto;
+  }
+  th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: right; vertical-align: top; }
+  th { background: var(--table-head); font-weight: 600; white-space: nowrap; }
+  tr:nth-child(even) td { background: color-mix(in srgb, var(--code-bg) 45%, transparent); }
+  ul, ol { margin: 0 0 1.1em; padding-inline-start: 1.6em; }
+  li { margin: .35em 0; }
+  strong { font-weight: 700; }
+  @media print {
+    body { max-width: none; padding: 0; font-size: 11.5pt; }
+    h2 { break-after: avoid; }
+    table, pre, blockquote { break-inside: avoid; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+<h1>پیشنهاد تغییرات برای سازگاری با اپ‌های دبیان و اجرای روان</h1>
+<blockquote>
+<p><strong>دستگاه:</strong> iPad Pro M5، ۱۲ گیگابایت، iPadOS 27.2 · <strong>LinPad 1.5.0</strong> (Alpine 3.21، musl)
+<strong>مطالعهٔ موردی:</strong> جایگزینی Firefox ESR 128.14 با نسخهٔ جدید دبیان
+<strong>وضعیت:</strong> فقط پیشنهاد و گزارش؛ چیزی اعمال نشده است.</p>
+</blockquote>
+<hr>
+<h2>خلاصه اجرایی</h2>
+<p>سازگاری با اپ‌های دبیان دو مسئلهٔ جدا است که مردم با هم اشتباه می‌گیرند:</p>
+<p>۱. <strong>مسئلهٔ نصب</strong> — «فایل <code>.deb</code> را چطور روی این سیستم بگذارم؟» این تقریباً حل شده است: جزیرهٔ glibc + <code>linpad-get</code> کار می‌کند.
+۲. <strong>مسئلهٔ یکپارچگی و روانی</strong> — «چرا هر اپ جدید یک ماجرای دستی است، و چرا کند است؟» این حل نشده است، و دلیلش هم فایل <code>.deb</code> نیست.</p>
+<p>پیشنهاد من در سه لایه، با ترتیب بازدهی:</p>
+<table>
+<thead>
+<tr>
+<th>اولویت</th>
+<th>تغییر</th>
+<th>نوع</th>
+<th>تخمین</th>
+<th>اثر</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>۱</strong></td>
+<td><code>pcache</code> را از ۴۸ مگابایت به ۲۵۶ مگابایت ببرید (مخصوص iPad)</td>
+<td>۲ خط C + یک تنظیم</td>
+<td>۲ ساعت</td>
+<td><strong>بیشترین اثر روی سرعت اجرای مجدد Firefox/Node</strong></td>
+</tr>
+<tr>
+<td><strong>۲</strong></td>
+<td>تبدیل جزیرهٔ glibc به یک <strong>مخزن apk</strong> (<code>linpad-compat</code>) و بسته‌بندی اپ‌های دبیان به‌صورت پکیج</td>
+<td>اسکریپت + CI</td>
+<td>۳–۵ روز</td>
+<td>نصب/حذف/آپدیت با <code>apk</code>، دیده‌شدن در استور، حذف تمیز</td>
+</tr>
+<tr>
+<td><strong>۳</strong></td>
+<td>چند <code>prctl</code> ساده در هسته (<code>NO_NEW_PRIVS</code>، <code>PDEATHSIG</code>، <code>DUMPABLE</code>، <code>SUBREAPER</code>)</td>
+<td>۳۰ خط C</td>
+<td>۳–۴ ساعت</td>
+<td>بخش بزرگی از اپ‌های sandbox‌دار بدون <code>--no-sandbox</code> بالا می‌آیند</td>
+</tr>
+<tr>
+<td>۴</td>
+<td>سقف JIT arena بر اساس <code>hw.memsize</code> (۵۱۲ مگابایت روی ≥۸ گیگ)</td>
+<td>۵ خط</td>
+<td>۱ ساعت</td>
+<td>کمتر شدن ترجمهٔ تکراری در مرورگر</td>
+</tr>
+<tr>
+<td>۵</td>
+<td>resolver چندمنبعی دبیان (main + security + updates)</td>
+<td>اسکریپت</td>
+<td>۱–۲ روز</td>
+<td>بدون آن، بستهٔ امنیتی Firefox اصلاً پیدا نمی‌شود</td>
+</tr>
+<tr>
+<td>۶</td>
+<td>مهاجرت rootfs به Alpine 3.24</td>
+<td>build</td>
+<td>۱ روز</td>
+<td>Firefox ESR 140.12 و Qt/GTK جدید، به‌صورت بومی</td>
+</tr>
+</tbody></table>
+<p>قاعدهٔ کلی: <strong>هرچه اپ را به بستهٔ Alpine نزدیک‌تر کنید، روان‌تر است.</strong> جزیرهٔ glibc یک پل است، نه مقصد. اما برای اپ‌هایی که فقط <code>.deb</code> دارند، این پل باید «یک‌بار برای همیشه» ساخته شود، نه هر بار دستی.</p>
+<hr>
+<h2>۱. تشخیص: امروز چرا کند و ناسازگار است؟</h2>
+<p>چهار گلوگاه واقعی وجود دارد، و هیچ‌کدام «کم بودن رم» نیست:</p>
+<h3>۱٫۱ کش ترجمهٔ دائمی (pcache) برای این دستگاه کوچک تنظیم شده</h3>
+<p>در <code>jit/pcache.c:156-158</code> اندازهٔ پیش‌فرض <strong>۴۸ مگابایت روی iOS</strong> و ۱۲۸ مگابایت روی مک است. کامنت خود فایل می‌گوید این کش برای این است که «node، claude، Firefox و شل سریع‌تر بالا بیایند، چون <code>libxul</code> و <code>libnode</code> دوباره ترجمه نمی‌شوند».</p>
+<p>اما <code>libxul</code> تنها در پروسهٔ اصلی حدود <strong>۱۸۰ مگابایت</strong> ترجمه می‌خواهد (کامنت <code>jit/codemem.c:216-217</code>). یعنی کش ۴۸ مگابایتی تقریباً بلافاصله پر می‌شود و از نو شروع می‌کند. روی یک دستگاه ۱۲ گیگی با ۱۵۳ گیگابایت‌بر‌ثانیه پهنای باند، این عدد بی‌معنی است.</p>
+<h3>۱٫۲ سقف JIT بر اساس حافظهٔ آزاد لحظهٔ شروع</h3>
+<p><code>jit/codemem.c:221</code> می‌گوید اگر بیش از ۳ گیگابایت آزاد باشد، ۲۵۶ مگابایت بردار. روی M5/۱۲GB این تقریباً همیشه ۲۵۶ می‌شود — یعنی گزینهٔ «automatic» عملاً همان ۲۵۶ است، در حالی که اپ تا ۱۰۲۴ را قبول می‌کند (<code>AppDelegate.m:242-246</code>).</p>
+<h3>۱٫۳ sandbox: نه seccomp، نه userns — و <code>prctl</code> ناقص</h3>
+<p><code>kernel/misc.c:7-26</code> فقط دو <code>prctl</code> را می‌شناسد: <code>PR_SET_KEEPCAPS</code> و <code>PR_SET_NAME</code>. بقیه با <code>EINVAL</code> برمی‌گردند. این یعنی:</p>
+<ul>
+<li><code>PR_SET_NO_NEW_PRIVS</code> شکست می‌خورد → Chromium/Firefox/Electron نمی‌توانند sandbox را راه بیندازند و یا کرش می‌کنند یا مجبورید <code>--no-sandbox</code> بدهید.</li>
+<li><code>PR_SET_PDEATHSIG</code> شکست می‌خورد → بعضی helperها بعد از مرگ والد یتیم می‌مانند.</li>
+<li><code>PR_SET_DUMPABLE</code> / <code>PR_SET_CHILD_SUBREAPER</code> → رفتارهای فرعی عجیب.</li>
+</ul>
+<p>این تنها یکی از دلایلی است که اپ‌های Electron روی این سیستم «کار می‌کنند ولی با پرچم» — و همان چیزی است که با ۳۰ خط C قابل بهبود است.</p>
+<h3>۱٫۴ داده‌ها، نه باینری‌ها</h3>
+<p>اپ دبیان فقط کتابخانه نمی‌خواهد: اسکیمای GSettings، فایل‌های MIME، آیکون‌ها، فونت‌ها، <code>systemd</code> unit (که نداریم) و گاهی helperهای <code>libexec</code>. اگر این‌ها نصب نشوند، اپ «اجرا می‌شود ولی صفحهٔ سفید/خطای schema» می‌دهد. <code>linpad-get</code> فعلی پیلود کامل <code>.deb</code> را می‌ریزد، پس این را پوشش می‌دهد — ولی <code>debfetch</code> که فقط <code>lib*</code> را دنبال می‌کند، نه.</p>
+<hr>
+<h2>۲. پیشنهاد اصلی: «لایهٔ سازگاری دبیان» به‌عنوان یک قابلیت، نه یک اسکریپت</h2>
+<h3>۲٫۱ تصویر کلی</h3>
+<pre><code>        ┌──────────────────────────────────────────────┐
+        │  Store (Swift)  ──  ایندکس دوم: compat       │
+        └───────────────┬──────────────────────────────┘
+                        │  apk add linpad-app-firefox-esr
+        ┌───────────────▼──────────────────────────────┐
+        │  مخزن apk:  linpad-compat (aarch64)          │
+        │   • linpad-runtime-glibc  (جزیره، نسخه‌دار)  │
+        │   • linpad-app-&lt;name&gt;     (اپ تبدیل‌شده)     │
+        └───────────────┬──────────────────────────────┘
+                        │  نصب/حذف/آپدیت توسط apk
+        ┌───────────────▼──────────────────────────────┐
+        │  /opt/linpad-apps/&lt;name&gt;/  +  wrapper + .desktop │
+        └──────────────────────────────────────────────┘
+</code></pre>
+<p>چرا <strong>apk</strong> و نه یک نصب‌کنندهٔ اختصاصی؟</p>
+<ul>
+<li><code>apk</code> از قبل مالک فایل‌ها، وابستگی‌ها، نسخه‌ها و حذف تمیز است — چیزی که <code>linpad-get</code> دستی انجام می‌دهد و همیشه ناقص می‌ماند.</li>
+<li>استور همین حالا بسته‌های apk را می‌فهمد (<code>linpad-apps</code> + <code>store-index.json</code>)؛ با یک مخزن جدید، <strong>بدون تغییر معماری</strong> اپ‌های دبیان هم در استور ظاهر می‌شوند.</li>
+<li><code>apk upgrade</code> همه‌چیز را با هم به‌روز می‌کند، از جمله اپ‌های دبیان.</li>
+</ul>
+<h3>۲٫۲ پنج قطعهٔ لازم</h3>
+<table>
+<thead>
+<tr>
+<th>قطعه</th>
+<th>کار</th>
+<th>جایی که وصل می‌شود</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>الف) <code>linpad-runtime-glibc</code></strong></td>
+<td>جزیرهٔ glibc را به یک بستهٔ apk نسخه‌دار تبدیل می‌کند (<code>/usr/lib/aarch64-linux-gnu</code> + لودر + <code>Depends</code> روی libs)</td>
+<td><code>devtools/install-vscode.sh</code> فعلی، تعمیم‌یافته</td>
+</tr>
+<tr>
+<td><strong>ب) <code>deb2apk</code></strong></td>
+<td>یک <code>.deb</code> (و closure وابستگی‌هایش) را به یک apk با <code>Depends: linpad-runtime-glibc</code> تبدیل می‌کند</td>
+<td>ابزار جدید در <code>tools/</code></td>
+</tr>
+<tr>
+<td><strong>ج) resolver چندمنبعی</strong></td>
+<td><code>Packages.xz</code> را از <code>trixie/main</code>، <code>trixie-security</code> و <code>trixie-updates</code> می‌خواند و وابستگی‌ها را با blocklist حل می‌کند</td>
+<td>ارتقای <code>devtools/debfetch.mjs</code></td>
+</tr>
+<tr>
+<td><strong>د) policy engine</strong></td>
+<td>برای هر اپ تصمیم می‌گیرد: <code>--no-sandbox</code>؟ <code>MOZ_DISABLE_CONTENT_SANDBOX</code>؟ X11 rule؟ کدام prefs؟</td>
+<td>فایل <code>policy.json</code> + مولد wrapper</td>
+</tr>
+<tr>
+<td><strong>هـ) ایندکس استور</strong></td>
+<td><code>linpad-compat-index.json</code> با <code>kind: &quot;compat&quot;</code>، وضعیت سازگاری و حجم</td>
+<td><code>linpad-store-index.mjs</code></td>
+</tr>
+</tbody></table>
+<h3>۲٫۳ چرا resolver فعلی کافی نیست — و چطور درستش کنیم</h3>
+<p><code>debfetch.mjs</code> امروز:</p>
+<ul>
+<li>فقط <code>lib*</code> را دنبال می‌کند (<code>isLibraryPackage</code>)، پس <code>libavcodec61</code> (که برای پخش H.264 لازم است) اگر به‌عنوان Recommends باشد نمی‌آید.</li>
+<li>فقط یک suite/mirror می‌شناسد (<code>--suite trixie</code>)، پس <strong>Firefox 153.7 که در <code>trixie-security</code> است پیدا نمی‌شود</strong> — این را با تست واقعی تأیید کردم: <code>firefox-esr</code> در trixie/main نیست، در <code>security.debian.org/debian-security</code> است.</li>
+<li><code>Recommends</code> را نمی‌خواند، در حالی که برای مرورگر و Qt تقریباً همیشه لازم است.</li>
+</ul>
+<p>پیشنهاد دقیق:</p>
+<pre><code class="language-js">// ورودی: [{suite:&#39;trixie&#39;, mirror:&#39;https://deb.debian.org/debian&#39;},
+//         {suite:&#39;trixie-security&#39;, mirror:&#39;https://security.debian.org/debian-security&#39;}]
+// خروجی: انتخاب نسخهٔ بالاتر، دنبال‌کردن Depends + Recommends با blocklist
+const BLOCK = [&#39;systemd&#39;,&#39;systemd-sysv&#39;,&#39;udev&#39;,&#39;initramfs-tools&#39;,&#39;dbus-daemon&#39;,
+               &#39;libpam-systemd&#39;,&#39;policykit-1&#39;,&#39;snapd&#39;,&#39;apparmor&#39;];
+</code></pre>
+<p>و یک نکتهٔ مهم: <code>debfetch</code> الان <code>roots</code> را (اپ) هم دانلود می‌کند و فقط وابستگی‌هایش را فیلتر می‌کند. یعنی <strong>همین ابزار می‌تواند کل اپ + کتابخانه‌هایش را در یک prefix بریزد</strong>. این پایهٔ <code>deb2apk</code> است.</p>
+<h3>۲٫۴ قرارداد هر بستهٔ compat</h3>
+<pre><code>/opt/linpad-apps/&lt;name&gt;/app/…            # پیلود .deb
+/opt/linpad-apps/&lt;name&gt;/lib/…            # فقط اگر نسخهٔ خصوصی لازم است
+/usr/local/bin/&lt;name&gt;                    # wrapper با unset + پرچم‌ها
+/usr/share/applications/&lt;name&gt;.desktop
+/etc/ishwl/apps                          # اگر X11 لازم است
+/var/lib/linpad-apps/&lt;name&gt;.json         # منبع، نسخهٔ دبیان، تاریخ
+</code></pre>
+<p><code>Depends: linpad-runtime-glibc (= 2026.11)</code> تضمین می‌کند جزیره همیشه قبل از اپ نصب شود و با آپدیت اپ، سازگار بماند.</p>
+<h3>۲٫۵ policy engine — قلب «روانی»</h3>
+<p>برای هر اپ، این تصمیم‌ها باید <strong>خودکار</strong> باشند، نه دستی:</p>
+<table>
+<thead>
+<tr>
+<th>نشانه</th>
+<th>تصمیم</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>resources/app.asar</code> یا <code>chrome-sandbox</code> وجود دارد</td>
+<td>Electron → <code>--no-sandbox</code> + <code>ELECTRON_OZONE_PLATFORM_HINT=wayland</code></td>
+</tr>
+<tr>
+<td>نام باینری <code>firefox*</code></td>
+<td><code>MOZ_ENABLE_WAYLAND=1</code>، <code>security.sandbox.content.level=0</code>، prefs فایرفاکس</td>
+</tr>
+<tr>
+<td>لینک به <code>libQt6Core</code> دارد</td>
+<td><code>QT_QPA_PLATFORM=wayland</code>؛ اگر پلاگین QtWayland نبود → هشدار «Qt runtime لازم است»</td>
+</tr>
+<tr>
+<td><code>.desktop</code> می‌گوید <code>Exec=… x11</code> یا باینری <code>libX11</code> دارد</td>
+<td>قاعدهٔ <code>x11</code> در <code>/etc/ishwl/apps</code></td>
+</tr>
+<tr>
+<td>بسته <code>glib-2.0/schemas/*.xml</code> دارد</td>
+<td><code>glib-compile-schemas</code> در post-install</td>
+</tr>
+<tr>
+<td>بسته فونت/آیکون دارد</td>
+<td><code>ish-apply-style --cache-only</code></td>
+</tr>
+</tbody></table>
+<p>این جدول همان چیزی است که امروز در مغز شما و در README من است؛ باید در کد باشد.</p>
+<h3>۲٫۶ استور و ماتریس تست</h3>
+<p>مشکل فعلی: ۷۷۱ اپ از ۸۰۰ «Not tested» هستند. برای compat هم همین اتفاق می‌افتد اگر تست خودکار نباشد.</p>
+<p>پیشنهاد: یک harness در CI که هر بستهٔ compat را در emulator بالا می‌آورد (<code>ishwl</code> headless)، ۱۵ ثانیه صبر می‌کند، اسکرین‌شات می‌گیرد و سه وضعیت می‌دهد: <code>launches</code> / <code>crashes</code> / <code>no-window</code>. همان کاری که پروژه برای پک‌ها دستی کرده (<code>release/CHECKLIST.md</code>، جدول پک‌ها). خروجی این harness، فیلد <code>compat</code> در ایندکس است.</p>
+<hr>
+<h2>۳. تغییرات کوچک هسته که سازگاری را جهش می‌دهد</h2>
+<h3>۳٫۱ <code>prctl</code> — ۳۰ خط، بزرگ‌ترین برد</h3>
+<p><code>kernel/misc.c</code> را این‌طور گسترش دهید (مقادیر ثابت لینوکس):</p>
+<table>
+<thead>
+<tr>
+<th>option</th>
+<th>مقدار</th>
+<th>رفتار پیشنهادی</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PR_SET_PDEATHSIG</code></td>
+<td>۱</td>
+<td>ذخیره در task؛ در <code>exit</code> سیگنال بفرست (یا حداقل ۰ برگردان)</td>
+</tr>
+<tr>
+<td><code>PR_SET_DUMPABLE</code></td>
+<td>۴</td>
+<td>۰ برگردان</td>
+</tr>
+<tr>
+<td><code>PR_GET_DUMPABLE</code></td>
+<td>۳</td>
+<td>۱ برگردان</td>
+</tr>
+<tr>
+<td><code>PR_SET_TIMERSLACK</code></td>
+<td>۲۹</td>
+<td>۰</td>
+</tr>
+<tr>
+<td><code>PR_SET_CHILD_SUBREAPER</code></td>
+<td>۳۶</td>
+<td>۰</td>
+</tr>
+<tr>
+<td><code>PR_SET_NO_NEW_PRIVS</code></td>
+<td>۳۸</td>
+<td>۰ (فقط اگر setuid باینری‌ها را جدی نمی‌گیرید)</td>
+</tr>
+<tr>
+<td><code>PR_GET_NO_NEW_PRIVS</code></td>
+<td>۳۹</td>
+<td>۱</td>
+</tr>
+<tr>
+<td><code>PR_SET_VMA</code></td>
+<td>۸۰</td>
+<td>۰</td>
+</tr>
+</tbody></table>
+<p>اثر: Chromium/Electron/Firefox بدون پرچم <code>--no-sandbox</code> هم ممکن است بالا بیایند (چون حداقل <code>NO_NEW_PRIVS</code> موفق می‌شود)، و برنامه‌هایی که <code>PDEATHSIG</code> می‌خواهند درست کار می‌کنند.</p>
+<h3>۳٫۲ <code>seccomp</code> — با احتیاط</h3>
+<p><code>syscall(SYS_seccomp, …)</code> امروز <code>ENOSYS</code> است. دو گزینه:</p>
+<ul>
+<li><strong>محافظه‌کارانه (پیشنهاد من):</strong> همان <code>ENOSYS</code> بماند؛ اکثر برنامه‌ها fallback دارند و کرش نمی‌کنند.</li>
+<li><strong>پراگماتیک:</strong> <code>SECCOMP_SET_MODE_FILTER</code> را قبول کن و فیلتر را نادیده بگیر (۰ برگردان). اپ‌های سخت‌گیر بالا می‌آیند، ولی <strong>sandbox واقعی وجود ندارد</strong> و این یک ریسک امنیتی است. اگر این کار را کردید، حتماً در UI اعلام کنید.</li>
+</ul>
+<h3>۳٫۳ <code>/proc</code> — فیلدهایی که برنامه‌ها می‌خوانند</h3>
+<ul>
+<li><code>/proc/self/status</code>: <code>NoNewPrivs</code>، <code>Seccomp</code>، <code>CapEff</code> را اضافه کنید تا ابزارهایی که وضعیت sandbox را چک می‌کنند گمراه نشوند.</li>
+<li><code>/proc/sys/vm/overcommit_memory</code> و <code>/proc/sys/kernel/*</code> را با مقادیر ثابت پاسخ دهید (بعضی اپ‌ها موقع شروع می‌خوانند).</li>
+<li><code>/proc/cpuinfo</code> باید <code>Features</code> معقول داشته باشد (NEON/ASIMD) — امروز دارد.</li>
+</ul>
+<h3>۳٫۴ فراخوان‌های جدید glibc</h3>
+<p><code>faccessat2</code>، <code>statx</code>، <code>clone3</code>، <code>pidfd_open</code> اگر نیستند، بهتر است <code>ENOSYS</code> برگردانند (نه <code>EINVAL</code>) تا glibc به مسیر قدیمی fallback کند. این یک قاعدهٔ کلی است: <strong><code>ENOSYS</code> یعنی «این را ندارم، راه دیگری برو»؛ <code>EINVAL</code> یعنی «درخواستت غلط است» و بعضی کتابخانه‌ها را متوقف می‌کند.</strong></p>
+<hr>
+<h2>۴. پیشنهادهای عملکردی (به ترتیب بازدهی)</h2>
+<h3>۴٫۱ pcache: ۴۸ → ۲۵۶ مگابایت</h3>
+<table>
+<thead>
+<tr>
+<th>کجا</th>
+<th>تغییر</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>jit/pcache.c:156-158</code></td>
+<td><code>def_mb = 256</code> روی iOS (یا بر اساس <code>hw.memsize</code>)</td>
+</tr>
+<tr>
+<td><code>app/AppDelegate.m</code></td>
+<td><code>setenv(&quot;ISH_JIT_PCACHE_MB&quot;, …)</code> از یک تنظیم جدید</td>
+</tr>
+<tr>
+<td><code>FastMode.swift</code></td>
+<td>افزودن گزینهٔ «Persistent cache» با مقادیر ۴۸/۱۲۸/۲۵۶/۵۱۲</td>
+</tr>
+</tbody></table>
+<p>سود: اجرای دوم به بعد Firefox/Node/Claude Code به‌طور محسوس سریع‌تر؛ هزینه: تا ۲۵۶ مگابایت از حافظهٔ سقف jetsam (روی ۱۲ گیگابایت ناچیز) و مقداری نوشتن روی SSD در هر خروج پروسه.</p>
+<h3>۴٫۲ JIT arena بر اساس سخت‌افزار، نه حافظهٔ لحظهٔ boot</h3>
+<pre><code class="language-c">// به‌جای avail &gt; 3GB ? 256MB : ...
+uint64_t ram = 0; size_t sz = sizeof(ram);
+sysctlbyname(&quot;hw.memsize&quot;, &amp;ram, &amp;sz, NULL, 0);
+arena_size = ram &gt;= (8ull &lt;&lt; 30) ? 512u &lt;&lt; 20 : avail &gt; (3ull &lt;&lt; 30) ? 256u &lt;&lt; 20 : ...
+</code></pre>
+<h3>۴٫۳ پروفایل Firefox (هم برای نسخهٔ Alpine و هم دبیان)</h3>
+<p>مقادیر کلیدی که امروز در <code>release/guest/gecko-tune.sh</code> هست، برای نسخهٔ دبیان هم باید اعمال شود:</p>
+<ul>
+<li><code>dom.ipc.processCount=1</code> و <code>fission.autostart=false</code> — هر پروسهٔ اضافه یک کپی کامل ترجمهٔ <code>libxul</code> می‌خواهد.</li>
+<li><code>layout.css.stylo-threads=2</code> — هر ترد مهمان حدود ۱٫۳ مگابایت هزینهٔ میزبان دارد (<code>kernel/oom.c:30</code>).</li>
+<li><code>media.mediasource.webm.enabled=false</code> و <code>media.av1.enabled=false</code> — H.264 ارزان‌تر است (اعداد در همان فایل).</li>
+<li><code>browser.low_commit_space_threshold_percent=20</code> و <code>tabs.unloadOnLowMemory=true</code>.</li>
+<li>برای نسخهٔ دبیان: <code>security.sandbox.content.level=0</code> و <code>MOZ_DISABLE_CONTENT_SANDBOX=1</code> (چون seccomp نیست).</li>
+</ul>
+<h3>۴٫۴ <code>MALLOC_ARENA_MAX</code> برای هر اپ glibc</h3>
+<p>پروفایل <code>m5-tune.sh</code> این را روی ۶ گذاشت (از ۲). برای Firefox دبیان هم مهم است چون jemalloc خودش را دارد ولی کتابخانه‌های اطراف از glibc malloc استفاده می‌کنند.</p>
+<h3>۴٫۵ GPU برای مرورگر — با چشم باز</h3>
+<p>مسیر GPU الان این است: Venus → virglrenderer → MoltenVK → Metal، و <code>ishwl</code> فقط <code>wl_shm</code> می‌پذیرد (<code>gpu/DESIGN.md</code>). یعنی حتی اگر Firefox با zink رندر کند، فریم آخر با CPU کپی می‌شود. برای صفحهٔ معمولی سودی ندارد؛ برای ویدیوی بزرگ و اسکرول سنگین ممکن است چند فریم بدهد. <strong>اولویت پایین</strong> تا وقتی dma-buf در ishwl پیاده شود.</p>
+<h3>۴٫۶ مقیاس نمایش</h3>
+<p><code>/etc/ishwl/app-scale</code> را برای اپ‌های سنگین روی ۱ بگذارید (نصف پیکسل‌ها = نصف کار رندر). برای Firefox می‌توانید ۲ در حالت عادی و ۱ در fullscreen نگه دارید (همین الان پیش‌فرض است).</p>
+<hr>
+<h2>۵. مطالعهٔ موردی: جایگزینی Firefox</h2>
+<h3>۵٫۱ وضعیت واقعی نسخه‌ها</h3>
+<p>از شاخص‌های واقعی مخازن (نه حدس):</p>
+<table>
+<thead>
+<tr>
+<th>نسخه</th>
+<th>از کجا</th>
+<th>عدد</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>نصب‌شده در LinPad</strong></td>
+<td>Alpine 3.21 community</td>
+<td><code>firefox-esr 128.14.0-r0</code></td>
+</tr>
+<tr>
+<td>Firefox عادی در همان 3.21</td>
+<td>Alpine 3.21 community</td>
+<td><code>firefox 136.0.4-r0</code></td>
+</tr>
+<tr>
+<td>Alpine 3.24</td>
+<td><code>firefox-esr 140.12.0</code> / <code>firefox 151.0.3</code></td>
+<td>جدیدتر، musl</td>
+</tr>
+<tr>
+<td><strong>دبیان trixie (security)</strong></td>
+<td><code>firefox-esr 153.7.0esr-1~deb13u1</code></td>
+<td>جدیدترین، glibc، arm64</td>
+</tr>
+<tr>
+<td>حجم بستهٔ دبیان</td>
+<td>۷۰ مگابایت / نصب ۲۸۱ مگابایت</td>
+<td>arm64</td>
+</tr>
+</tbody></table>
+<p>نکتهٔ مهم: <code>128.14</code> نسخهٔ ESR است که <strong>پشتیبانی امنیتی‌اش تمام شده</strong>؛ این تنها دلیل لازم برای ارتقاست، حتی اگر ظاهراً همه‌چیز کار کند.</p>
+<h3>۵٫۲ سه مسیر</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>مسیر A: Alpine 3.24</th>
+<th>مسیر B: دبیان 153.7</th>
+<th>مسیر C: Firefox 136 از 3.21</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>نسخه</td>
+<td>ESR 140.12 یا Release 151</td>
+<td><strong>ESR 153.7</strong></td>
+<td>Release 136</td>
+</tr>
+<tr>
+<td>libc</td>
+<td>musl (بومی)</td>
+<td>glibc (جزیره)</td>
+<td>musl</td>
+</tr>
+<tr>
+<td>حجم اضافه</td>
+<td>~۰</td>
+<td>+۲۸۱MB اپ + ~۱۸۰MB کتابخانه</td>
+<td>~۰</td>
+</tr>
+<tr>
+<td>سرعت</td>
+<td>بیشترین</td>
+<td>کمی کمتر (لودر glibc + کتابخانه بیشتر)</td>
+<td>بیشترین</td>
+</tr>
+<tr>
+<td>sandbox</td>
+<td>همان وضع فعلی</td>
+<td>باید خاموش شود</td>
+<td>همان وضع فعلی</td>
+</tr>
+<tr>
+<td>زحمت</td>
+<td>build روت‌فاس + تست</td>
+<td><code>linpad-get</code>/compat</td>
+<td><code>apk add firefox</code></td>
+</tr>
+<tr>
+<td>ریسک</td>
+<td>متوسط (Mesa/Qt)</td>
+<td>متوسط (پروفایل + sandbox)</td>
+<td>کم</td>
+</tr>
+</tbody></table>
+<p><strong>توصیهٔ من:</strong> اگر «روان» اولویت است، مسیر A. اگر «جدیدترین نسخه» اولویت است، مسیر B — و در این حالت compat layer باید ساخته شود، وگرنه هر آپدیت یک ماجرای دستی است. مسیر C فقط یک مسکن است (۱۳۶ هم قدیمی است).</p>
+<h3>۵٫۳ مسیر B به‌صورت گام‌به‌گام (امروز، بدون ساخت لایه)</h3>
+<pre><code class="language-sh"># ۱. ابزارها
+apk add dpkg libarchive-tools xz zstd patchelf nodejs
+
+# ۲. پکیج‌ها را از مخزن امنیتی دبیان بگیرید (نه trixie/main)
+#    firefox-esr در trixie-security است
+mkdir -p /opt/compat/firefox-esr &amp;&amp; cd /var/cache
+curl -fLO https://security.debian.org/debian-security/pool/updates/main/f/firefox-esr/firefox-esr_153.7.0esr-1~deb13u1_arm64.deb
+
+# ۳. استخراج در یک prefix (نه در /)
+dpkg-deb -x firefox-esr_153.7.0esr-1~deb13u1_arm64.deb /opt/compat/firefox-esr
+
+# ۴. جزیرهٔ glibc را بسازید (اگر نیست)
+linpad-get island
+
+# ۵. اجرا با لودر دبیان
+env -u LD_PRELOAD MOZ_ENABLE_WAYLAND=1 MOZ_DISABLE_CONTENT_SANDBOX=1 \
+  /lib/ld-linux-aarch64.so.1 --library-path /usr/lib/aarch64-linux-gnu \
+  /opt/compat/firefox-esr/usr/lib/firefox-esr/firefox-esr --no-remote
+</code></pre>
+<p>اگر خطای کتابخانه گرفتید:</p>
+<pre><code class="language-sh">env -u LD_PRELOAD /lib/ld-linux-aarch64.so.1 --list /opt/compat/firefox-esr/usr/lib/firefox-esr/firefox-esr | grep &#39;not found&#39;
+</code></pre>
+<p>و بسته‌های گمشده را با <code>debfetch</code> اضافه کنید (فهرست موردنیاز Firefox از <code>Depends</code> خودش: <code>libevent-2.1-7t64</code>، <code>libvpx9</code>، <code>libx11-xcb1</code>، <code>libxcb-shm0</code>، <code>libcairo-gobject2</code>، <code>libffi8</code>، و برای ویدیو <code>libavcodec61</code>).</p>
+<h3>۵٫۴ چه چیزی می‌شکند و چطور</h3>
+<table>
+<thead>
+<tr>
+<th>نشانه</th>
+<th>علت</th>
+<th>راه‌حل</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>تب‌ها بلافاصله crash می‌کنند</td>
+<td>sandbox محتوا (seccomp نیست)</td>
+<td><code>security.sandbox.content.level=0</code> در prefs یا <code>MOZ_DISABLE_CONTENT_SANDBOX=1</code></td>
+</tr>
+<tr>
+<td>«Your browser can&#39;t play this video»</td>
+<td>نبود <code>libavcodec</code></td>
+<td><code>libavcodec61</code> را به جزیره اضافه کنید</td>
+</tr>
+<tr>
+<td>صفحهٔ سفید و بدون منو</td>
+<td>نبود schema/آیکون</td>
+<td><code>glib-compile-schemas</code> + بررسی <code>/usr/share/glib-2.0/schemas</code></td>
+</tr>
+<tr>
+<td>پروفایل قدیمی باز نمی‌شود</td>
+<td>ارتقای ۱۲۸ → ۱۵۳ یک‌طرفه است</td>
+<td>قبلش از <code>~/.mozilla</code> بکاپ بگیرید</td>
+</tr>
+<tr>
+<td>فونت فارسی بد</td>
+<td>فونت‌های Alpine (Noto) استفاده می‌شوند</td>
+<td><code>font-noto-arabic</code> نصب باشد</td>
+</tr>
+</tbody></table>
+<h3>۵٫۵ مهاجرت پروفایل</h3>
+<pre><code class="language-sh">cp -a /root/.mozilla /root/.mozilla-backup-$(date +%F)
+# سپس Firefox جدید را با همان پروفایل اجرا کنید؛ ارتقا خودکار است و برگشت‌پذیر نیست
+</code></pre>
+<hr>
+<h2>۶. نقشهٔ راه پیشنهادی</h2>
+<h3>فاز ۰ — همین امروز، بدون build (۲ ساعت)</h3>
+<ul>
+<li><code>m5-tune.sh</code> + کش ۵۱۲ + پروفایل Firefox.</li>
+<li>تصمیم بگیرید کدام مسیر Firefox را می‌خواهید (A یا B).</li>
+</ul>
+<h3>فاز ۱ — تغییرات کوچک با بازدهی بالا (۱–۲ روز)</h3>
+<ul>
+<li><code>pcache</code> قابل‌تنظیم + پیش‌فرض ۲۵۶MB روی ≥۸GB.</li>
+<li><code>arena</code> بر اساس <code>hw.memsize</code>.</li>
+<li><code>prctl</code> stubs + تست چند اپ sandbox‌دار.</li>
+</ul>
+<h3>فاز ۲ — compat layer واقعی (۱–۲ هفته)</h3>
+<ul>
+<li>resolver چندمنبعی + <code>deb2apk</code> + مخزن <code>linpad-compat</code>.</li>
+<li>policy engine + wrapper/desktop خودکار.</li>
+<li>harness تست خودکار برای برچسب سازگاری.</li>
+<li>ایندکس دوم استور.</li>
+</ul>
+<h3>فاز ۳ — پایهٔ بلندمدت (۱ ماه)</h3>
+<ul>
+<li>مهاجرت rootfs به Alpine 3.24 (بسته‌های بومی جدیدتر).</li>
+<li>dma-buf در ishwl (برای GPU واقعی).</li>
+<li>seccomp/namespace اگر روزی خواستید Flatpak — که فعلاً منطقی نیست.</li>
+</ul>
+<hr>
+<h2>۷. ریسک‌ها و ملاحظات</h2>
+<table>
+<thead>
+<tr>
+<th>ریسک</th>
+<th>توضیح</th>
+<th>کاهش</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>بستهٔ apk ساختگی و امضا</td>
+<td>مخزن compat باید کلید امضای خودش را داشته باشد و در <code>/etc/apk/keys</code> نصب شود</td>
+<td>کلید جدا، مستند، قابل بازبینی</td>
+</tr>
+<tr>
+<td>نگهداری نسخه‌ها</td>
+<td>هر آپدیت دبیان یعنی بازسازی بسته</td>
+<td>CI خودکار روی <code>trixie-security</code></td>
+</tr>
+<tr>
+<td>sandbox خاموش</td>
+<td>امنیت کمتر در محیطی که همه‌چیز root است</td>
+<td>اعلام در UI، فقط برای اپ‌های مشخص</td>
+</tr>
+<tr>
+<td>حافظه</td>
+<td>هر اپ compat یک prefix دارد؛ چند اپ Electron = چند صد مگابایت</td>
+<td><code>du</code> در ایندکس، هشدار حجم</td>
+</tr>
+<tr>
+<td>pcache بزرگ</td>
+<td>نوشتن روی SSD و مصرف حافظه</td>
+<td>سقف ۲۵۶MB، پاک‌کردن خودکار</td>
+</tr>
+<tr>
+<td>Alpine 3.21 EOL</td>
+<td>پایهٔ ناامن</td>
+<td>فاز ۳</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>۸. اگر فقط سه کار بتوانید بکنید</h2>
+<p>۱. <strong><code>pcache</code> را روی ۲۵۶ مگابایت بگذارید</strong> — بیشترین اثر روی «روان بودن» با کمترین تغییر.
+۲. <strong><code>prctl</code> را کامل کنید</strong> — بزرگ‌ترین برد سازگاری؛ اپ‌های Electron و مرورگرها بدون پرچم بالا می‌آیند.
+۳. <strong>Firefox را از دبیان نصب کنید، ولی به‌عنوان یک بستهٔ compat، نه یک دستور دستی</strong> — تا آپدیتش هم مثل بقیه باشد.</p>
+<p>و یک توصیهٔ صادقانه: اگر هدف «مرورگر به‌روز و روان» است، بهترین ترکیب برای این دستگاه <strong>Firefox بومی Alpine 3.24 (ESR 140)</strong> است با pcache بزرگ؛ نسخهٔ دبیان ۱۵۳ جدیدتر است، ولی به‌خاطر glibc و sandbox، در عمل روان‌تر نخواهد بود — فقط به‌روزتر است. اگر با این تفاوت راحت هستید، مسیر B درست است و باید compat layer را جدی ساخت.</p>
+<hr>
+<h2>پیوست — فایل‌هایی که این تغییرات را لمس می‌کنند</h2>
+<p><code>jit/pcache.c</code> · <code>jit/codemem.c</code> · <code>kernel/misc.c</code> · <code>kernel/fs.c</code> · <code>kernel/fork.c</code> · <code>app/AppDelegate.m</code> · <code>desktop/DesktopKit/Sources/DesktopKit/Core/System/FastMode.swift</code> · <code>devtools/debfetch.mjs</code> · <code>release/guest/gecko-tune.sh</code> · <code>release/guest/linpad/linpad-apps</code> · <code>release/guest/linpad/store/linpad-store-index.mjs</code> · <code>fs/mount.c</code></p>
+
+</body>
+</html>

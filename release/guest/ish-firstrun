@@ -1,0 +1,10 @@
+#!/bin/sh
+# Compatibility name for linpad-apps (the optional-apps catalog, /usr/share/linpad).
+#   ish-firstrun            install what onboarding chose and is not installed yet
+#   ish-firstrun --pending  print those pack ids
+#   ish-firstrun PACK...    install the given packs
+case "${1:-}" in
+--pending) exec linpad-apps pending ;;
+"") exec linpad-apps firstrun ;;
+*) exec linpad-apps install "$@" ;;
+esac

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>فازها به زبان ساده، تغییرات بی‌هزینه و ایده‌های نصب آسان</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --accent: #0a84ff; --code-bg: #f2f2ef; --table-head: #f6f6f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --fg: #e8e8ea; --muted: #a0a0a6; --line: #2c2c31;
+      --accent: #4da3ff; --code-bg: #1e1e23; --table-head: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 48px 24px 96px; max-width: 920px;
+    background: var(--bg); color: var(--fg);
+    font-family: Vazirmatn, "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
+    font-size: 17px; line-height: 1.95; text-align: right;
+  }
+  h1, h2, h3, h4 { line-height: 1.5; font-weight: 700; letter-spacing: -0.01em; }
+  h1 { font-size: 2rem; margin: 0 0 .4em; }
+  h2 {
+    font-size: 1.5rem; margin: 2.4em 0 .8em; padding-bottom: .35em;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 1.18rem; margin: 1.8em 0 .6em; }
+  h4 { font-size: 1.02rem; margin: 1.4em 0 .4em; color: var(--muted); }
+  p { margin: 0 0 1.05em; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: currentColor; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2.6em 0; }
+  blockquote {
+    margin: 1.6em 0; padding: 1em 1.2em; border-right: 4px solid var(--accent);
+    background: var(--code-bg); border-radius: 0 10px 10px 0; color: var(--muted);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  code, pre, kbd {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    direction: ltr; unicode-bidi: embed; text-align: left;
+  }
+  code { background: var(--code-bg); padding: .12em .35em; border-radius: 5px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); padding: 16px 18px; border-radius: 10px;
+    overflow-x: auto; line-height: 1.65; font-size: .86em; margin: 1.2em 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: .93em;
+    display: block; overflow-x: auto;
+  }
+  th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: right; vertical-align: top; }
+  th { background: var(--table-head); font-weight: 600; white-space: nowrap; }
+  tr:nth-child(even) td { background: color-mix(in srgb, var(--code-bg) 45%, transparent); }
+  ul, ol { margin: 0 0 1.1em; padding-inline-start: 1.6em; }
+  li { margin: .35em 0; }
+  strong { font-weight: 700; }
+  @media print {
+    body { max-width: none; padding: 0; font-size: 11.5pt; }
+    h2 { break-after: avoid; }
+    table, pre, blockquote { break-inside: avoid; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+<h1>فازها به زبان ساده + تغییراتی که سیستم را کند نمی‌کند + ایده‌های نصب آسان</h1>
+<blockquote>
+<p><strong>دستگاه:</strong> iPad Pro M5، ۱۲ گیگابایت · <strong>LinPad 1.5.0</strong> · iPadOS 27.2
+<strong>این گزارش:</strong> ترجمهٔ فازهای فنی به کارهای روزمره، دسته‌بندی تغییرات از نظر «کند می‌کند یا نه»، و پیشنهادهای من برای نصب آسان‌تر.
+<strong>وضعیت:</strong> فقط گزارش؛ چیزی اعمال نشده است.</p>
+</blockquote>
+<hr>
+<h2>خلاصه در سه جمله</h2>
+<p>۱. <strong>بزرگ‌ترین برد سرعت، هیچ ربطی به دبیان ندارد:</strong> کش ترجمهٔ دائمی روی این دستگاه ۴۸ مگابایت است و باید ۲۵۶ باشد. این تنها تغییری است که «بار دوم» فایرفاکس را واقعاً سریع می‌کند.</p>
+<p>۲. <strong>تنها تغییرات «بی‌هزینه» از نظر سرعت</strong> این‌ها هستند: بزرگ‌کردن کش ترجمه، کامل‌کردن <code>prctl</code>، و ساختن مخزن بسته‌های دبیان. بقیه (swapfile، GPU، پروسه‌های بیشتر) یا کند می‌کنند یا باید اندازه‌گیری شوند.</p>
+<p>۳. <strong>برای نصب آسان، بهترین ایده این است که <code>.deb</code> از دید کاربر ناپدید شود:</strong> یک دکمهٔ «نصب با لینک» در استور، به‌جای دستور در ترمینال.</p>
+<hr>
+<h2>بخش ۱ — فازها، این‌بار به زبان کارهای روزمره</h2>
+<p>هر فاز را این‌طور بخوانید: «چه کاری می‌کنم / چه چیزی می‌بینم / چقدر طول می‌کشد / چطور برمی‌گردم».</p>
+<h3>فاز ۰ — «امروز، بدون هیچ تغییری در اپ»</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>چه می‌کنید</strong></td>
+<td>Code cache = ۵۱۲ · Performance overlay روشن · <code>m5-tune.sh</code> را اجرا می‌کنید · یک‌بار سشن را ری‌استارت می‌کنید</td>
+</tr>
+<tr>
+<td><strong>چه می‌بینید</strong></td>
+<td>فایرفاکس همان است، ولی کندی کمتری موقع باز کردن تب‌های زیاد دارد؛ VS Code و Node کمتر «out of memory» می‌دهند</td>
+</tr>
+<tr>
+<td><strong>چقدر طول می‌کشد</strong></td>
+<td>۲۰ دقیقه</td>
+</tr>
+<tr>
+<td><strong>چه چیزی کند می‌شود</strong></td>
+<td>هیچ‌چیز. فقط چند مگابایت از سقف حافظه مصرف می‌شود</td>
+</tr>
+<tr>
+<td><strong>چطور برگردید</strong></td>
+<td><code>sh m5-tune.sh --undo</code> و برگرداندن Code cache به Automatic</td>
+</tr>
+<tr>
+<td><strong>معیار موفقیت</strong></td>
+<td>عدد <code>phys_footprint</code> در اوج، و زمان باز شدن یک تب سنگین</td>
+</tr>
+</tbody></table>
+<p>این فاز را دست‌کم نگیرید: بیشتر مردم همین‌جا می‌مانند و ۸۰٪ تجربه را می‌گیرند.</p>
+<blockquote>
+<p><strong>وضعیت: پیاده‌سازی شد.</strong> فایل <code>personalize/phase0.sh</code> همین فاز را با یک دستور انجام می‌دهد: اندازه‌گیری پایه، اعمال پروفایل، و یادآوری سه تنظیم. دستور: <code>sh phase0.sh</code> و بعد <code>sh phase0.sh --after</code>. سه تنظیم iPad را همچنان باید خودتان بزنید (اپ اجازه نمی‌دهد از داخل لینوکس عوض شوند).</p>
+</blockquote>
+<h3>فاز ۱ — «موتور را برای این دستگاه کوک می‌کنیم» (۱ تا ۲ روز کار دولوپر)</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>چه می‌کنید</strong></td>
+<td>سه تغییر کوچک در سورس: کش ترجمه ۴۸ → ۲۵۶، سقف JIT بر اساس رم دستگاه، و چند <code>prctl</code></td>
+</tr>
+<tr>
+<td><strong>چه می‌بینید</strong></td>
+<td>بار دوم باز کردن فایرفاکس/VS Code/Claude محسوس سریع‌تر (<code>libxul</code> دیگر از صفر ترجمه نمی‌شود). بعضی اپ‌های Electron بدون <code>--no-sandbox</code> بالا می‌آیند</td>
+</tr>
+<tr>
+<td><strong>چقدر طول می‌کشد</strong></td>
+<td>۱–۲ روز کدنویسی + یک build + نیم روز تست</td>
+</tr>
+<tr>
+<td><strong>چه چیزی کند می‌شود</strong></td>
+<td>بار اولِ هر اپ کمی کندتر نیست؛ فقط حافظهٔ بیشتری رزرو می‌شود (روی ۱۲ گیگابایت ناچیز). روی دستگاه TXM، کش JIT به‌طور کامل مقیم می‌شود؛ ۵۱۲ مگابایت یعنی ۵۱۲ مگابایت از سقف — آگاهانه انتخاب کنید</td>
+</tr>
+<tr>
+<td><strong>چطور برگردید</strong></td>
+<td>دو متغیر محیطی: <code>ISH_JIT_PCACHE_MB=48</code> و <code>ISH_JIT_CACHE_MB=256</code></td>
+</tr>
+<tr>
+<td><strong>معیار موفقیت</strong></td>
+<td>زمان «بار دوم» فایرفاکس، تعداد ترجمه‌های تکراری در لاگ <code>[jit]</code></td>
+</tr>
+</tbody></table>
+<h3>فاز ۲ — «مغازهٔ اپ دبیان» (۱ تا ۲ هفته کار دولوپر)</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>چه می‌کنید</strong></td>
+<td>یک مخزن apk به نام <code>linpad-compat</code> می‌سازید و ۲۰–۳۰ اپ دبیان را به بستهٔ apk تبدیل می‌کنید</td>
+</tr>
+<tr>
+<td><strong>چه می‌بینید</strong></td>
+<td>در استور، کنار اپ‌های Alpine، اپ‌های دبیان هم با آیکون و حجم و دکمهٔ Install دیده می‌شوند. حذف و آپدیت‌شان مثل بقیه است</td>
+</tr>
+<tr>
+<td><strong>چقدر طول می‌کشد</strong></td>
+<td>۱–۲ هفته (بیشترش تست است، نه کد)</td>
+</tr>
+<tr>
+<td><strong>چه چیزی کند می‌شود</strong></td>
+<td><strong>هیچ‌چیز در زمان اجرا.</strong> این فاز فقط نصب را عوض می‌کند. تنها هزینه: چند صد مگابایت فضای دیسک برای اپ‌هایی که نصب می‌کنید</td>
+</tr>
+<tr>
+<td><strong>چطور برگردید</strong></td>
+<td>بستهٔ compat را حذف کنید؛ هیچ فایل سیستمی دست نمی‌خورد چون همه‌چیز در <code>/opt</code> است</td>
+</tr>
+<tr>
+<td><strong>معیار موفقیت</strong></td>
+<td>نصب یک اپ دبیان از استور، در کمتر از ۲ کلیک، و حذف کامل بدون باقی‌مانده</td>
+</tr>
+</tbody></table>
+<h3>فاز ۳ — «پایهٔ بلندمدت» (۱ ماه، اختیاری)</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>چه می‌کنید</strong></td>
+<td>system image را از Alpine 3.21 به 3.24 می‌برید (Firefox ESR 140، Qt/GTK جدید، وصله‌های امنیتی)</td>
+</tr>
+<tr>
+<td><strong>چه می‌بینید</strong></td>
+<td>بسته‌های بومی جدیدتر؛ دیگر لازم نیست برای هر اپ سراغ دبیان بروید</td>
+</tr>
+<tr>
+<td><strong>چقدر طول می‌کشد</strong></td>
+<td>۱ روز build + ۲–۳ روز تست (Mesa و قفل‌های نسخه باید دوباره کالیبره شوند)</td>
+</tr>
+<tr>
+<td><strong>چه چیزی کند می‌شود</strong></td>
+<td><strong>ممکن است.</strong> نسخه‌های جدید Qt/GTK حتماً سریع‌تر نیستند. این تنها فازی است که باید قبل/بعد اندازه‌گیری شود</td>
+</tr>
+<tr>
+<td><strong>چطور برگردید</strong></td>
+<td>system image قبلی در <code>Settings › Filesystems</code> می‌ماند</td>
+</tr>
+<tr>
+<td><strong>معیار موفقیت</strong></td>
+<td>همان ۵ عدد بخش ۳، که نباید بدتر شوند</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>بخش ۲ — کدام تغییر سرعت را می‌گیرد و کدام نمی‌گیرد؟</h2>
+<p>این جدول مهم‌ترین بخش این گزارش است. علامت‌ها: ✅ بی‌هزینه یا سودمند · ⚠️ مشروط (باید اندازه‌گیری/تنظیم شود) · ❌ به‌طور پیش‌فرض نکنید.</p>
+<p>یک توضیح کوچک که خیلی‌ها را گمراه می‌کند: ما دو «کش» جدا داریم و نباید قاطی شوند.</p>
+<table>
+<thead>
+<tr>
+<th>نام</th>
+<th>چه چیزی است</th>
+<th>کجا</th>
+<th>عدد فعلی</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>pcache</strong> (کش ترجمهٔ دائمی)</td>
+<td>کد ترجمه‌شده را <strong>روی دیسک</strong> نگه می‌دارد تا اجرای بعدی دوباره ترجمه نکند</td>
+<td><code>jit/pcache.c</code></td>
+<td>۴۸ مگابایت</td>
+</tr>
+<tr>
+<td><strong>JIT arena</strong> (ناحیهٔ کد)</td>
+<td>فضایی که کد ترجمه‌شده <strong>در رم</strong> اجرا می‌شود</td>
+<td><code>jit/codemem.c</code></td>
+<td>۲۵۶ مگابایت</td>
+</tr>
+</tbody></table>
+<p>pcache روی «شروع بعدی» اثر دارد؛ arena روی «در حین اجرا». هر دو مفیدند، ولی با هزینه‌های متفاوت.</p>
+<table>
+<thead>
+<tr>
+<th>تغییر</th>
+<th>روی سرعت</th>
+<th>روی حافظه</th>
+<th>روی دیسک</th>
+<th>حکم</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>بزرگ‌کردن pcache (۴۸ → ۲۵۶)</td>
+<td>بار دوم سریع‌تر؛ بار اول همان است</td>
+<td>+~۲۰۰MB سقف</td>
+<td>~۲۵۶MB نوشته</td>
+<td>⚠️ <strong>با سقف، بله</strong></td>
+</tr>
+<tr>
+<td>سقف JIT ۵۱۲</td>
+<td>ترجمهٔ تکراری کمتر</td>
+<td>روی TXM تمام ۵۱۲ مقیم می‌شود</td>
+<td>کم</td>
+<td>⚠️ روی ۱۲GB بله</td>
+</tr>
+<tr>
+<td><code>prctl</code> stubs</td>
+<td><strong>هیچ</strong> (فقط وقتی صدا زده می‌شود)</td>
+<td>~۰</td>
+<td>۰</td>
+<td>✅ <strong>بله</strong></td>
+</tr>
+<tr>
+<td>مخزن apk برای اپ‌های دبیان</td>
+<td><strong>هیچ</strong> (فقط زمان نصب)</td>
+<td>۰</td>
+<td>به‌اندازهٔ اپ‌ها</td>
+<td>✅ <strong>بله</strong></td>
+</tr>
+<tr>
+<td>policy engine (پرچم‌های خودکار)</td>
+<td><strong>هیچ</strong></td>
+<td>۰</td>
+<td>۰</td>
+<td>✅ <strong>بله</strong></td>
+</tr>
+<tr>
+<td>swapfile</td>
+<td>❌ می‌تواند کند کند (توقف کوتاه هنگام فشار)</td>
+<td>آزاد می‌کند</td>
+<td>تا چند GB</td>
+<td>⚠️ فقط اگر jetsam واقعاً شما را می‌کشد</td>
+</tr>
+<tr>
+<td>GPU/zink برای مرورگر</td>
+<td>نامعلوم؛ برای صفحهٔ ساده ممکن است کندتر</td>
+<td>+چند صد MB</td>
+<td>۰</td>
+<td>⚠️ فقط با تست A/B</td>
+</tr>
+<tr>
+<td>پروسهٔ بیشتر برای فایرفاکس</td>
+<td>❌ کندتر (هر پروسه یک ترجمهٔ کامل <code>libxul</code>)</td>
+<td>+</td>
+<td>۰</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>--scale 1</code></td>
+<td>✅ سریع‌تر (~⅓ بار رندر)</td>
+<td>۰</td>
+<td>۰</td>
+<td>⚠️ به قیمت نرمی متن</td>
+</tr>
+<tr>
+<td>Alpine 3.24</td>
+<td>نامعلوم</td>
+<td>نامعلوم</td>
+<td>+</td>
+<td>⚠️ اندازه‌گیری لازم</td>
+</tr>
+<tr>
+<td>قبول‌کردن <code>seccomp</code> بدون پیاده‌سازی</td>
+<td>هیچ</td>
+<td>۰</td>
+<td>۰</td>
+<td>❌ ریسک امنیتی، سود صفر</td>
+</tr>
+<tr>
+<td>نصب اپ‌های Electron</td>
+<td>❌ هر اپ ۳۰۰–۶۰۰ مگابایت</td>
+<td>+</td>
+<td>+</td>
+<td>⚠️ فقط اگر معادل بومی ندارد</td>
+</tr>
+</tbody></table>
+<h3>۲٫۱ چرا بزرگ‌کردن pcache «بی‌خطر» است ولی «رایگان» نیست</h3>
+<p>کش ترجمه، ترجمهٔ کد <code>libxul</code>/<code>libnode</code> را روی دیسک نگه می‌دارد. سه اثر دارد:</p>
+<ul>
+<li><strong>بار دوم:</strong> کد آماده است → سریع‌تر. این همان چیزی است که می‌خواهیم.</li>
+<li><strong>حافظه:</strong> جدول ایندکس همیشه ۱۶ مگابایت است (۱ میلیون خانه × ۱۶ بایت) و فایل داده تا سقف رشد می‌کند. ۲۵۶ مگابایت از سقف jetsam روی ۱۲ گیگابایت یعنی ~۲٪.</li>
+<li><strong>خروج از پروسه:</strong> <code>jit_pcache_save()</code> روی خروج اجرا می‌شود؛ با کش بزرگ‌تر، نوشتن بیشتری دارد. اگر این را حس کردید، فلاش دوره‌ای را زودتر کنید (<code>ISH_JIT_TRIM_EVERY_MS</code>).</li>
+</ul>
+<p>پس توصیهٔ دقیق: <strong>۲۵۶، نه ۵۱۲</strong>؛ و اگر دستگاه ۱۶ گیگی بود، ۵۱۲.</p>
+<h3>۲٫۲ چرا سقف JIT ۵۱۲ روی M5 دو لبه است</h3>
+<p>کامنت <code>jit/codemem.c</code> صریح می‌گوید روی دستگاه‌های TXM <strong>کل ناحیهٔ کد مقیم می‌شود</strong> (دیباگر همهٔ صفحه‌ها را می‌نویسد). یعنی ۵۱۲ مگابایت یعنی ۵۱۲ مگابایت از سقف حافظه، از همان اول. روی ۱۲ گیگابایت با entitlement منطقی است؛ بدون entitlement (که وضعیت فعلی IPA است) ۲۵۶ گزینهٔ امن‌تری است.</p>
+<p>قاعده: <strong>اول entitlement، بعد کش بزرگ.</strong></p>
+<h3>۲٫۳ چرا <code>prctl</code> هیچ هزینه‌ای ندارد</h3>
+<p>این تابع فقط وقتی صدا زده می‌شود که برنامه‌ای صدایش بزند (چند بار در شروع هر پروسه، نه در حلقهٔ داغ). اضافه‌کردن چند <code>case</code> که <code>0</code> برمی‌گردانند، روی سرعت اجرا اثری ندارد. اثرش روی <strong>سازگاری</strong> است: برنامه‌هایی که <code>NO_NEW_PRIVS</code> یا <code>PDEATHSIG</code> می‌خواهند، دیگر با EINVAL متوقف نمی‌شوند.</p>
+<h3>۲٫۴ چرا مخزن apk هیچ هزینهٔ اجرایی ندارد</h3>
+<p><code>apk</code> فقط زمان نصب/حذف کار می‌کند. بعد از نصب، فایل‌ها همان‌جا هستند و هیچ سرویس یا daemon جدیدی اجرا نمی‌شود. تنها هزینه، دیسک است.</p>
+<p><strong>شرط مهم:</strong> در بسته‌های compat هیچ autostart، هیچ سرویس پس‌زمینه و هیچ <code>post-install</code> سنگینی نگذارید. وگرنه همان چیزی می‌شود که سیستم را کند می‌کند.</p>
+<h3>۲٫۵ چیزهایی که واقعاً سیستم را کند می‌کنند</h3>
+<ul>
+<li><strong>نصب سه چهار اپ Electron</strong> (Slack + Discord + Signal = بیش از ۱ گیگابایت و کلی پروسه).</li>
+<li><strong>باز گذاشتن دو مرورگر</strong> هم‌زمان.</li>
+<li><strong>swapfile روشن روی دستگاه ۱۲ گیگی که هیچ‌وقت به سقف نمی‌رسد</strong> — فقط نوشتن بی‌مورد.</li>
+<li><strong>بیشتر کردن پروسه‌های فایرفاکس</strong> به امید سرعت؛ نتیجهٔ عکس دارد.</li>
+<li><strong>نصب بسته‌های <code>-dev</code> و <code>-dbg</code></strong> برای اپ‌های دبیان که فقط فضای دیسک و ایندکس را شلوغ می‌کند.</li>
+<li><strong><code>apk upgrade</code> کورکورانه</strong> روی شاخهٔ EOL؛ ممکن است بسته‌های نیمه‌سازگار بیاورد.</li>
+</ul>
+<hr>
+<h2>بخش ۳ — پروتکل ۵ دقیقه‌ای اندازه‌گیری (تا حدس نزنیم)</h2>
+<p>قبل از هر تغییری این پنج عدد را بگیرید و بعد از تغییر مقایسه کنید. اگر بدتر شد، برگردید.</p>
+<pre><code class="language-sh"># ۱. حافظهٔ پایه و سقف
+cat /proc/ish/memory | head -5
+
+# ۲. سرعت خام CPU (برای اینکه بفهمید JIT عوض شده یا نه)
+time sh -c &#39;i=0; while [ $i -lt 200000 ]; do i=$((i+1)); done&#39;
+time node -e &#39;let s=0; for (let i=0;i&lt;3e8;i++) s+=i; console.log(s)&#39;
+
+# ۳. بار اول فایرفاکس (کرنومتر دستی یا لاگ)
+#    Settings › Performance overlay را روشن کنید و زمان تا ظاهر شدن پنجره را بنویسید
+firefox-esr https://example.com
+
+# ۴. بار دوم همان (این عدد باید با pcache بزرگ‌تر بهتر شود)
+#    فایرفاکس را کامل ببندید و دوباره باز کنید
+
+# ۵. مصرف CPU در حالت بی‌کار
+top -b -n 1 | head -15
+</code></pre>
+<p><strong>قاعدهٔ تصمیم:</strong> اگر بعد از یک تغییر، عدد ۲ بدتر شد یا عدد ۵ بالا رفت، تغییر را بردارید. عدد ۳ و ۴ باید بهتر شوند وگرنه ارزش نداشته.</p>
+<hr>
+<h2>بخش ۴ — پیشنهادهای من برای «نصب آسان» اپ‌های لینوکسی</h2>
+<p>این‌ها ایده‌های من است، جدا از چیزهایی که قبلاً ساختیم. به ترتیب نسبت «سود به زحمت».</p>
+<h3>۴٫۱ نصب با لینک، از داخل استور (بهترین ایده)</h3>
+<p>امروز کاربر باید فایل را دانلود کند، به ترمینال برود، <code>linpad-get</code> را صدا بزند. این برای یک سیستم‌عامل «مصرفی» غلط است.</p>
+<p>پیشنهاد: در استور یک کادر «نصب از لینک» با این رفتار:</p>
+<ol>
+<li>کاربر لینک <code>.deb</code>/AppImage را paste می‌کند.</li>
+<li>اپ، فایل را دانلود و فرمت را تشخیص می‌دهد.</li>
+<li>قبل از نصب، یک کارت نشان می‌دهد: نام، نسخه، معماری، حجم دانلود، حجم نصب، «تست‌شده روی M5؟».</li>
+<li>نصب با همان <code>linpad-apps</code>/<code>linpad-get</code> و پیشرفت زنده.</li>
+<li>بعد از نصب: «باز کن» و «حذف».</li>
+</ol>
+<p>این کار در سمت Swift حدود ۱ روز است، چون زیرساخت نصب و پیشرفت از قبل هست (<code>StoreModel</code> + <code>linpad-apps</code>).</p>
+<h3>۴٫۲ «قفسهٔ دبیان» — ۲۰ اپ تست‌شده، نه ۸۰۰ اپ تست‌نشده</h3>
+<p>مشکل امروز: ۷۷۱ اپ «Not tested». برای compat هم همین اتفاق می‌افتد اگر همه‌چیز را لیست کنیم.</p>
+<p>پیشنهاد: فقط ۲۰–۳۰ اپ پرکاربرد را به‌صورت بستهٔ compat بسازید و <strong>هرکدام را در CI واقعاً اجرا کنید</strong> (headless ishwl + اسکرین‌شات). برچسب «Works in LinPad M5» فقط برای همان‌ها باشد. بقیه در بخش «تجربی» بمانند.</p>
+<h3>۴٫۳ «نصب خودکار وابستگی» به‌جای پیام خطا</h3>
+<p>امروز اگر کتابخانه‌ای کم باشد، <code>linpad-get</code> می‌گوید «این را کم داری» و کار تمام است. پیشنهاد:</p>
+<ol>
+<li><code>ld-linux --list</code> را اجرا کن.</li>
+<li>کتابخانه‌های <code>not found</code> را بگیر.</li>
+<li>در ایندکس دبیان بگرد (<code>packages.debian.org</code> معادل محلی، از <code>Packages.xz</code>).</li>
+<li>بستهٔ صاحب آن را پیدا کن و <strong>خودکار</strong> به لیست جزیره اضافه کن.</li>
+<li>فقط اگر حل نشد، پیام بده.</li>
+</ol>
+<p>این همان چیزی است که <code>dpkg</code> با <code>apt</code> می‌کند؛ ما هم می‌توانیم، چون ایندکس فقط ۳۰۴ کیلوبایت است (بخش امنیتی trixie).</p>
+<h3>۴٫۴ تشخیص خودکار نوع اپ و پرچم‌هایش</h3>
+<p>جدولی که در گزارش قبلی نوشتم (Electron → <code>--no-sandbox</code>، Qt → هشدار runtime، X11 → rule، schema → compile) باید در کد باشد، نه در ذهن کاربر. این کار «نصب می‌شود ولی باز نمی‌شود» را تقریباً حذف می‌کند.</p>
+<h3>۴٫۵ آپدیت واقعی برای اپ‌های دبیان</h3>
+<p>امروز <code>linpad-get</code> فقط نصب می‌کند. پیشنهاد: <code>linpad-get update</code> که:</p>
+<ul>
+<li>نسخهٔ نصب‌شده را با ایندکس دبیان مقایسه می‌کند،</li>
+<li>فقط اپ‌هایی را که خودتان نصب کرده‌اید آپدیت می‌کند،</li>
+<li>قبل از آپدیت، پروفایل/تنظیمات کاربر را بکاپ می‌گیرد.</li>
+</ul>
+<p>بدون این، هر آپدیت فایرفاکس یک ماجرای دستی است — که دقیقاً مشکل فعلی شماست.</p>
+<h3>۴٫۶ «یک کلیک» برای AppImage</h3>
+<p>کاربر فایل <code>.AppImage</code> را در Files آیپد دارد. اگر روی آن «Open with LinPad» بزند، اپ باید خودش extract کند، آیکون را بردارد، <code>.desktop</code> بسازد و در لانچر بگذارد. این با URL scheme (<code>linpad://install?file=…</code>) قابل انجام است و تقریباً همان زیرساخت ۴٫۱ را می‌خواهد.</p>
+<h3>۴٫۷ نسخهٔ «سبک» هر اپ را پیشنهاد بده</h3>
+<p>در کارت نصب، اگر معادل Alpine وجود دارد، بالاتر نشانش بده: «این اپ در Alpine هم هست: ۴۰ مگابایت، نصب بومی، بدون لایهٔ سازگاری». این تنها راهی است که کاربر کم‌کم به سمت گزینهٔ درست هدایت شود.</p>
+<h3>۴٫۸ نگهداری: «تعمیر» و «بازگردانی»</h3>
+<p>اپلیکیشن‌هایی که در <code>/opt</code> نصب می‌شوند ممکن است بعد از آپدیت system image بشکنند. پروژه از قبل <code>linpad-repair</code> دارد. پیشنهاد: بعد از هر آپدیت سیستم، خودکار یک بررسی اجرا شود: «۳ اپ compat داری؛ ۱ تای‌شان نیاز به بازسازی دارد».</p>
+<h3>۴٫۹ چیزهایی که پیشنهاد <strong>نمی‌کنم</strong></h3>
+<ul>
+<li><strong>Flatpak/Snap شبیه‌سازی‌شده</strong> — بدون namespace معنی ندارد.</li>
+<li><strong>Docker</strong> — همان دلیل.</li>
+<li><strong>APT کامل روی Alpine</strong> — شبیه‌سازی apt با dpkg روی musl، فقط دردسر است؛ همان resolver سبک کافی است.</li>
+<li><strong>نصب خودکار از هر لینکی بدون تأیید</strong> — یک کلیک باید یک تأیید داشته باشد.</li>
+</ul>
+<hr>
+<h2>بخش ۵ — جمع‌بندی: سه کار امن، سه کار با احتیاط</h2>
+<h3>امن (بدون ریسک کندی)</h3>
+<ol>
+<li><code>pcache</code> = ۲۵۶ و در Settings قابل‌تنظیم.</li>
+<li><code>prctl</code> stubs.</li>
+<li>مخزن apk برای اپ‌های دبیان + policy engine.</li>
+</ol>
+<h3>با احتیاط (اول اندازه‌گیری، بعد ماندن)</h3>
+<ol>
+<li>سقف JIT ۵۱۲ — فقط با entitlement حافظه.</li>
+<li>swapfile — فقط اگر jetsam واقعاً شما را می‌کشد.</li>
+<li>Alpine 3.24 — فقط اگر ۵ عدد بخش ۳ بدتر نشوند.</li>
+</ol>
+<h3>هرگز</h3>
+<ol>
+<li><code>seccomp</code> قلابی.</li>
+<li>پروسه‌های بیشتر برای فایرفاکس.</li>
+<li>انبوه اپ‌های Electron بدون معادل بومی.</li>
+</ol>
+<hr>
+<h2>پیوست — ترتیب اجرای پیشنهادی (برای خودتان)</h2>
+<table>
+<thead>
+<tr>
+<th>هفته</th>
+<th>کار</th>
+<th>نتیجهٔ قابل مشاهده</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>همین امروز</td>
+<td>فاز ۰</td>
+<td>کندی کمتر، حافظهٔ کنترل‌شده</td>
+</tr>
+<tr>
+<td>هفتهٔ ۱</td>
+<td>فاز ۱ (pcache + arena + prctl)</td>
+<td>بار دوم فایرفاکس سریع‌تر</td>
+</tr>
+<tr>
+<td>هفتهٔ ۲–۳</td>
+<td>فاز ۲ (مخزن + policy + ۲۰ اپ)</td>
+<td>نصب از استور، حذف تمیز</td>
+</tr>
+<tr>
+<td>ماه دوم</td>
+<td>۴٫۱ و ۴٫۳ (نصب با لینک، وابستگی خودکار)</td>
+<td>«مثل اپ استور»</td>
+</tr>
+<tr>
+<td>ماه دوم</td>
+<td>فاز ۳ (Alpine 3.24) با اندازه‌گیری</td>
+<td>بسته‌های جدید، امنیت</td>
+</tr>
+</tbody></table>
+
+</body>
+</html>

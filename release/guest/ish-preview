@@ -1,0 +1,12 @@
+#!/bin/sh
+# Opens a web page in the iPad's Quick Preview (Safari's engine, hardware video decoding),
+# whatever the desktop's URL handler is: "preview URL" on ishwl's notify FIFO.
+#   ish-preview https://...    e.g. a video page too heavy for Firefox under emulation
+url=${1#ishpreview:}
+case $url in
+    http://*|https://*) ;;
+    *) echo "usage: ish-preview http(s)://..." >&2; exit 2 ;;
+esac
+notify=/tmp/ishwl/notify
+encoded=$(printf '%s' "$url" | sed 's/%/%25/g; s/ /%20/g')
+[ -p "$notify" ] && timeout 2 sh -c 'printf "preview %s\n" "$1" > "$2"' sh "$encoded" "$notify"

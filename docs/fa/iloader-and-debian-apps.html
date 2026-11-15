@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نصب LinPad با iloader و نصب اپ‌های دبیان</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --accent: #0a84ff; --code-bg: #f2f2ef; --table-head: #f6f6f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --fg: #e8e8ea; --muted: #a0a0a6; --line: #2c2c31;
+      --accent: #4da3ff; --code-bg: #1e1e23; --table-head: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: 48px 24px 96px; max-width: 920px;
+    background: var(--bg); color: var(--fg);
+    font-family: Vazirmatn, "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
+    font-size: 17px; line-height: 1.95; text-align: right;
+  }
+  h1, h2, h3, h4 { line-height: 1.5; font-weight: 700; letter-spacing: -0.01em; }
+  h1 { font-size: 2rem; margin: 0 0 .4em; }
+  h2 {
+    font-size: 1.5rem; margin: 2.4em 0 .8em; padding-bottom: .35em;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 1.18rem; margin: 1.8em 0 .6em; }
+  h4 { font-size: 1.02rem; margin: 1.4em 0 .4em; color: var(--muted); }
+  p { margin: 0 0 1.05em; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: currentColor; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2.6em 0; }
+  blockquote {
+    margin: 1.6em 0; padding: 1em 1.2em; border-right: 4px solid var(--accent);
+    background: var(--code-bg); border-radius: 0 10px 10px 0; color: var(--muted);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  code, pre, kbd {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    direction: ltr; unicode-bidi: embed; text-align: left;
+  }
+  code { background: var(--code-bg); padding: .12em .35em; border-radius: 5px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); padding: 16px 18px; border-radius: 10px;
+    overflow-x: auto; line-height: 1.65; font-size: .86em; margin: 1.2em 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: .93em;
+    display: block; overflow-x: auto;
+  }
+  th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: right; vertical-align: top; }
+  th { background: var(--table-head); font-weight: 600; white-space: nowrap; }
+  tr:nth-child(even) td { background: color-mix(in srgb, var(--code-bg) 45%, transparent); }
+  ul, ol { margin: 0 0 1.1em; padding-inline-start: 1.6em; }
+  li { margin: .35em 0; }
+  strong { font-weight: 700; }
+  @media print {
+    body { max-width: none; padding: 0; font-size: 11.5pt; }
+    h2 { break-after: avoid; }
+    table, pre, blockquote { break-inside: avoid; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+<h1>نصب LinPad با iloader و نصب اپ‌های دبیان روی آن</h1>
+<blockquote>
+<p><strong>دستگاه هدف:</strong> iPad Pro M5، iPadOS 27.2
+<strong>نسخه‌ای که نصب می‌شود:</strong> LinPad 1.5.0 — <code>LinPad-1.5.0.ipa</code> (۶۳۷ مگابایت)
+<strong>تاریخ:</strong> ۱۴ نوامبر ۲۰۲۶
+<strong>وضعیت:</strong> فقط گزارش؛ هیچ تغییری روی دستگاه یا پروژه اعمال نشده است.
+<strong>گزارش مرتبط:</strong> <a href="linpad-m5-report.md"><code>linpad-m5-report.md</code></a> — شخصی‌سازی و بهینه‌سازی برای M5/۱۲GB.</p>
+</blockquote>
+<hr>
+<h2>خلاصه</h2>
+<p><strong>الف) نصب با iloader</strong> کار می‌کند و کوتاه‌ترین مسیر است، ولی یک ریسک مشخص دارد: مستندات رسمی iloader دستگاه‌ها را تا <strong>iPadOS 26.2</strong> پشتیبانی می‌کند و شما روی <strong>27.2</strong> هستید. گزارش‌های میدانی می‌گویند روی 27 هم نصب انجام می‌شود، ولی جایی که روی 27 می‌شکند، <strong>ساخت pairing file</strong> است — نه خود نصب. اگر در گام «شناسایی دستگاه»، «ورود Apple ID» یا ساخت pairing file گیر کردید، چند جایگزین دارید (بخش ۱٫۶).</p>
+<p><strong>ب) نصب اپ‌های دبیان</strong> روی LinPad به‌طور مستقیم ممکن نیست، چون LinPad یک Alpine/musl است و <code>dpkg/apt</code> ندارد. اما <strong>بیشتر اپ‌های دبیان با <code>.deb</code> آرم‌۶۴ نصب‌شدنی‌اند</strong>، به شرط اینکه با «جزیره glibc» و یک لانچر درست اجرا شوند — همان کاری که ابزار <code>personalize/linpad-get</code> انجام می‌دهد. سه دسته استثنا وجود دارد: اپ‌های x86_64-only، اپ‌های Qt که کتابخانه Qt دبیان می‌خواهند، و هر چیزی که به systemd/FUSE/namespace وابسته است.</p>
+<p><strong>ج) خبر خوب:</strong> بیشتر اپ‌هایی که مردم «اپ دبیان» صدا می‌زنند — GIMP، Inkscape، LibreOffice، KeePassXC، VLC، Thunderbird، Chromium، Firefox، Krita، Blender، Zotero، Okular، Telegram — بستهٔ Alpine دارند و <strong>اصلاً <code>.deb</code> نمی‌خواهند</strong>. اول این مسیر را چک کنید (بخش ۲٫۳).</p>
+<hr>
+<h2>بخش ۱ — نصب IPA با iloader</h2>
+<h3>۱.۱ پیش‌نیازها</h3>
+<table>
+<thead>
+<tr>
+<th>چیز</th>
+<th>جزئیات</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>کامپیوتر</td>
+<td>Windows 10/11، macOS 10.15+، یا Linux</td>
+</tr>
+<tr>
+<td>درایور USB</td>
+<td>Windows: <strong>iTunes کلاسیک</strong> (نسخه Microsoft Store گاهی usbmuxd را نصب نمی‌کند). macOS: همراه سیستم. Linux: <code>usbmuxd</code></td>
+</tr>
+<tr>
+<td>ابزار</td>
+<td>iloader <strong>v2.4.1</strong> — فقط از <a href="https://iloader.site/download/">iloader.site/download</a> یا <a href="https://github.com/nab138/iloader/releases">GitHub releases</a>. نسخه‌های بازبسته‌بندی‌شده در سایت‌های ثالث را نصب نکنید</td>
+</tr>
+<tr>
+<td>کابل</td>
+<td>USB داده‌دار (کابل‌های شارژ ارزان اغلب فقط برق دارند)</td>
+</tr>
+<tr>
+<td>حساب</td>
+<td>هر Apple ID با ورود دو مرحله‌ای؛ لازم نیست با حساب خود آیپد یکی باشد</td>
+</tr>
+<tr>
+<td>آیپد</td>
+<td>Developer Mode روشن (iOS 16+) + حداقل ~۴ گیگابایت فضای آزاد</td>
+</tr>
+<tr>
+<td>فایل</td>
+<td><code>LinPad-1.5.0.ipa</code> — <a href="https://github.com/fspecii/LinPad/releases/download/v1.5.0/LinPad-1.5.0.ipa">لینک مستقیم</a> (۶۳۷٬۰۰۶٬۰۲۶ بایت — بررسی شد و زنده است)</td>
+</tr>
+</tbody></table>
+<h3>۱.۲ هشدار سازگاری: iPadOS 27.2</h3>
+<p>سند سیستم‌موردنیاز رسمی iloader این بازه‌ها را می‌نامد: <strong>15.0–15.8.5، 16.0–17.7.7، 18.0–26.2</strong>. iPadOS 27.2 بیرون از این لیست است.</p>
+<p>شواهد میدانی (انجمن‌ها و گزارش کاربران، سپتامبر–نوامبر ۲۰۲۶) می‌گویند:</p>
+<ul>
+<li>خودِ <strong>نصب IPA روی 27 کار می‌کند</strong> (StikDebug و SideStore هم روی 27.0 تست و تأیید شده‌اند).</li>
+<li>آنچه روی 27 می‌شکند، <strong>انتقال pairing file</strong> است؛ بعضی کاربران با iloader موفق نشده‌اند و با Impactor یا ابزارهای جدیدتر موفق شده‌اند. از iOS 26.4 به بعد، Apple مکانیزم pairing را عوض کرده و یک «remote pairing file» لازم است که باید روی کامپیوتر ساخته شود.</li>
+<li>یعنی: انتظار داشته باشید نصب انجام شود، ولی اگر بعداً خواستید JIT (بخش ۱٫۵) را روشن کنید، ممکن است گام pairing دردسر داشته باشد.</li>
+</ul>
+<h3>۱.۳ کدام IPA را نصب کنید</h3>
+<table>
+<thead>
+<tr>
+<th>مورد</th>
+<th>مقدار</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>فایل</td>
+<td><code>LinPad-1.5.0.ipa</code></td>
+</tr>
+<tr>
+<td>Bundle ID</td>
+<td><code>com.valentinneagu.ish.arm64</code></td>
+</tr>
+<tr>
+<td>کمترین iPadOS</td>
+<td>۱۷٫۰</td>
+</tr>
+<tr>
+<td>حجم</td>
+<td>۶۳۷ مگابایت (شامل system image فشردهٔ ۵۸۹ مبی‌بایتی)</td>
+</tr>
+<tr>
+<td>فضای لازم بعد از نصب</td>
+<td>حدود ۳ گیگابایت (تصویر لینوکس ۲٫۲۴ گیگابایت باز می‌شود)</td>
+</tr>
+</tbody></table>
+<p><strong>نکته مهم:</strong> این IPA همان نسخهٔ رسمی پروژه است. یعنی <strong>پچ‌های M5 این پروژه را ندارد</strong>: نه entitlement افزایش حافظه، نه کش کد ۱۰۲۴، نه swapfile. اگر بعداً خواستید آن‌ها را داشته باشید، باید خودتان روی مک build کنید (بخش ۳٫۲ گزارش قبلی).</p>
+<h3>۱.۴ مراحل نصب</h3>
+<p><strong>گام ۰ — Developer Mode.</strong> روی آیپد: <code>Settings › Privacy &amp; Security › Developer Mode</code> را روشن کنید و دستگاه را ری‌استارت کنید. بعد از ری‌استارت، تأیید دوباره با رمز دستگاه لازم است.</p>
+<p><strong>گام ۱ — iTunes (فقط Windows).</strong> از سایت اپل نصب کنید و یک‌بار بازش کنید تا سرویس‌های usbmuxd نصب شوند. بعد می‌توانید ببندید. اگر iTunes از Microsoft Store نصب کرده‌اید و iloader دستگاه را نمی‌بیند، همان نسخه را حذف و نسخه کلاسیک را نصب کنید.</p>
+<p><strong>گام ۲ — iloader.</strong> از صفحه دانلود رسمی، نسخه ۲.۴.۱ را برای سیستم‌تان بگیرید و اجرا کنید.</p>
+<p><strong>گام ۳ — اتصال.</strong> کابل را وصل کنید، آیپد را باز کنید و روی «Trust This Computer» بزنید و رمز را وارد کنید.</p>
+<p><strong>گام ۴ — دستگاه و حساب.</strong> در iloader دستگاه باید در لیست بیاید. با Apple ID وارد شوید و کد دو مرحله‌ای را بدهید. اگر ورود شکست خورد، گزینهٔ <strong>Anisette server</strong> را عوض کنید (iloader چند سرور پیشنهاد می‌دهد) و اگر باز هم نشد، از مسیر <code>Reset Anisette State</code> استفاده کنید.</p>
+<p><strong>گام ۵ — نصب IPA.</strong> گزینهٔ <strong>Install IPA / Sideload IPA</strong> را بزنید و <code>LinPad-1.5.0.ipa</code> را انتخاب کنید. با ۶۳۷ مگابایت، روی USB 2 ممکن است ۵ تا ۱۵ دقیقه طول بکشد. در این مرحله iloader اپ را با گواهی حساب شما امضا می‌کند؛ <strong>گواهی هفت‌روزه</strong> است.</p>
+<p><strong>گام ۶ — اعتماد به پروفایل.</strong> اگر آیپد گفت «Untrusted Developer»: <code>Settings › General › VPN &amp; Device Management › &lt;your Apple ID&gt; › Trust</code>.</p>
+<p><strong>گام ۷ — اولین اجرا.</strong> LinPad باز می‌شود، اسپلش می‌آید و شروع می‌کند به باز کردن تصویر لینوکس: «Unpacking Linux… N of 690 MB». روی M5 حدود ۵ تا ۱۰ دقیقه. اپ را نبندید و در این مدت به Wi-Fi وصل باشید. بعد از آن «Configuring…» و «Starting desktop…».</p>
+<p><strong>گام ۸ — بررسی.</strong> داخل ترمینال (foot):</p>
+<pre><code class="language-sh">fastfetch | head -20                  # باید Apple M5 و Venus را نشان دهد
+cat /proc/ish/memory | head -5        # footprint و allowance واقعی
+vulkaninfo --summary | grep deviceName
+</code></pre>
+<p>اگر «Compatibility mode» دیدید، یعنی JIT روشن نیست — بخش بعدی.</p>
+<h3>۱.۵ روشن‌کردن JIT (اختیاری ولی مهم)</h3>
+<p>JIT فقط وقتی فعال می‌شود که یک <strong>دیباگر</strong> به پروسه وصل شود. LinPad خودش دیباگر ندارد؛ از StikDebug می‌خواهد این کار را بکند.</p>
+<ol>
+<li><strong>StikDebug</strong> را هم با iloader نصب کنید (از همان صفحه، یا IPA رسمی StikDebug). این هم اپ سایدلودشده است و همان سهمیهٔ ۳ اپ و ۷ روز را می‌خورد.</li>
+<li><strong>LocalDevVPN</strong> را نصب و وصل کنید. StikDebug از طریق یک تونل loopback به خود دستگاه وصل می‌شود. (در بعضی منطقه‌ها این اپ در App Store نیست؛ در آن صورت نسخهٔ سایدلودشدهٔ آن را استفاده کنید.)</li>
+<li><strong>Pairing file</strong> بسازید. iloader می‌تواند pairing file بسازد و export کند (منوی pairing/documents). فایل را با AirDrop/Files به آیپد ببرید و در StikDebug import کنید. روی iPadOS 26.4+ این فایل باید از نوع remote pairing باشد.</li>
+<li>LinPad را از <strong>Home Screen</strong> باز کنید (نه از داخل StikDebug). اسپلش باید «Enabling fast mode via StikDebug…» بگوید.</li>
+<li>تأیید: Quick Settings باید <strong>Native JIT ✓</strong> نشان دهد، و <code>Settings › Fast Mode › Status</code> بگوید «On».</li>
+</ol>
+<p>اگر شکست خورد: <code>Settings › Fast Mode</code> دلیل را می‌گوید (StikDebug نصب نیست / get-task-allow نیست / بیلد بدون JIT). دکمهٔ «Retry fast mode» بعد از شروع لینوکس هم کار می‌کند، ولی فقط برای برنامه‌هایی که از آن لحظه به بعد اجرا می‌شوند.</p>
+<h3>۱.۶ اگر iloader روی iPadOS 27 کار نکرد</h3>
+<table>
+<thead>
+<tr>
+<th>جایگزین</th>
+<th>مزیت</th>
+<th>عیب</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Impactor</strong></td>
+<td>روی 27 با pairing درست گزارش موفقیت دارد</td>
+<td>رابط ساده‌تر، مستندات کمتر</td>
+</tr>
+<tr>
+<td><strong>Sideloadly</strong></td>
+<td>بالغ‌ترین ابزار ویندوز</td>
+<td>نیاز به iTunes، رابط قدیمی</td>
+</tr>
+<tr>
+<td><strong>AltStore Classic 2.2+</strong></td>
+<td>تنها گزینه‌ای که entitlement افزایش حافظه را با حساب رایگان می‌پذیرد</td>
+<td>نیاز به AltServer روی PC و همان ۷ روز</td>
+</tr>
+<tr>
+<td><strong>SideStore + iloader</strong></td>
+<td>refresh خودکار در دستگاه</td>
+<td>pairing روی 27 حساس است</td>
+</tr>
+<tr>
+<td><strong>مک + Xcode</strong></td>
+<td>تنها مسیر قطعی روی iPadOS 27؛ entitlement و JIT هم با آن ممکن است</td>
+<td>مک لازم است</td>
+</tr>
+</tbody></table>
+<h3>۱.۷ انقضا، تمدید، و سهمیه</h3>
+<table>
+<thead>
+<tr>
+<th>موضوع</th>
+<th>با Apple ID رایگان</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>عمر گواهی</td>
+<td>حدود ۷ روز؛ بعد از آن اپ باز نمی‌شود</td>
+</tr>
+<tr>
+<td>تعداد اپ نصب‌شده</td>
+<td>۳ اپ هم‌زمان (شامل SideStore/StikDebug)</td>
+</tr>
+<tr>
+<td>App ID در هفته</td>
+<td>۱۰ مورد</td>
+</tr>
+<tr>
+<td>هشدار ۲۰۲۶</td>
+<td>Apple بعضی تیم‌های رایگان را «soft-ban» کرده و نصب با <code>0xe8008024</code> («The provisioning profile is banned») رد می‌شود؛ در این حالت باید گواهی/pairing را نو کرد یا حساب دیگری امتحان کرد</td>
+</tr>
+</tbody></table>
+<p><strong>تمدید:</strong> دو راه — الف) همان IPA را دوباره با iloader نصب کنید؛ ب) SideStore را باز بگذارید تا خودش refresh کند. <strong>دادهٔ لینوکس با نصب دوبارهٔ همان bundle id پاک نمی‌شود</strong>؛ فقط اگر اپ را حذف (uninstall) کنید، تصویر لینوکس و فایل‌هایتان از بین می‌رود.</p>
+<h3>۱.۸ عیب‌یابی</h3>
+<table>
+<thead>
+<tr>
+<th>نشانه</th>
+<th>علت محتمل</th>
+<th>کار</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>دستگاه در iloader نیست</td>
+<td>iTunes/usbmuxd، کابل، Trust</td>
+<td>کابل داده‌دار، تعویض پورت، نصب مجدد iTunes کلاسیک</td>
+</tr>
+<tr>
+<td>ورود Apple ID شکست می‌خورد</td>
+<td>anisette server</td>
+<td>عوض‌کردن سرور، <code>Reset Anisette State</code></td>
+</tr>
+<tr>
+<td>نصب با خطا تمام می‌شود</td>
+<td>امضا/App ID</td>
+<td>گواهی‌های قدیمی را revoke کنید، حساب دیگری</td>
+</tr>
+<tr>
+<td>«Untrusted Developer»</td>
+<td>پروفایل تأیید نشده</td>
+<td>Settings › VPN &amp; Device Management › Trust</td>
+</tr>
+<tr>
+<td>اپ بلافاصله بسته می‌شود</td>
+<td>گواهی منقضی/بن‌شده</td>
+<td>نصب دوباره</td>
+</tr>
+<tr>
+<td>«Unpacking» گیر می‌کند</td>
+<td>فضای کم یا app background</td>
+<td>۴ گیگابایت آزاد کنید، اپ را جلو نگه دارید</td>
+</tr>
+<tr>
+<td>JIT روشن نمی‌شود</td>
+<td>StikDebug/LocalDevVPN/pairing</td>
+<td>بخش ۱٫۵</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>بخش ۲ — نصب اپ‌های لینوکسی دبیان</h2>
+<h3>۲.۱ چرا <code>.deb</code> مثل دبیان نصب نمی‌شود</h3>
+<table>
+<thead>
+<tr>
+<th>تفاوت</th>
+<th>دبیان</th>
+<th>LinPad</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>مدیر بسته</td>
+<td><code>dpkg</code> + <code>apt</code></td>
+<td><code>apk</code> (Alpine)</td>
+</tr>
+<tr>
+<td>libc</td>
+<td>glibc</td>
+<td>musl</td>
+</tr>
+<tr>
+<td>معماری رایج بسته‌های منتشرشده</td>
+<td><code>amd64</code> (x86_64)</td>
+<td><code>aarch64</code></td>
+</tr>
+<tr>
+<td>init/سرویس</td>
+<td>systemd</td>
+<td>بدون systemd (<code>dbus</code> + <code>ishwl-session</code>)</td>
+</tr>
+<tr>
+<td>sandbox</td>
+<td>FUSE، namespace، seccomp</td>
+<td>هیچ‌کدام</td>
+</tr>
+</tbody></table>
+<p>پس <code>.deb</code> را نمی‌شود «نصب» کرد؛ باید <strong>باز کرد و کنار سیستم گذاشت</strong> — دقیقاً همان کاری که پروژه برای VS Code و Wine می‌کند.</p>
+<h3>۲.۲ درخت تصمیم</h3>
+<pre><code>اپ مورد نظر چیست؟
+├── بستهٔ Alpine دارد؟  ── بله ──▶ apk add  (سطح ۱: بهترین، سریع‌ترین)
+├── سازنده .deb arm64 می‌دهد؟ ── بله ──▶ linpad-get  (سطح ۲)
+├── سازنده AppImage/tar برای arm64 می‌دهد؟ ── بله ──▶ linpad-get (سطح ۳)
+├── فقط x86_64 است؟ ──▶ اجرا نمی‌شود (Box64 فقط برای برخی موارد)
+└── به systemd/FUSE/namespace نیاز دارد؟ ──▶ اجرا نمی‌شود
+</code></pre>
+<h3>۲.۳ سطح ۱ — اول دنبال معادل Alpine بگردید</h3>
+<p>اکثر «اپ‌های دبیان» که مردم می‌خواهند، بستهٔ Alpine دارند. این را جدی بگیرید: نصب apk ساده‌تر، سریع‌تر، به‌روزتر و پایدارتر است.</p>
+<pre><code class="language-sh">apk search -v keepassxc       # آیا هست؟
+apk info keepassxc            # جزئیات
+apk add keepassxc             # نصب
+</code></pre>
+<p>یا از اپ <strong>Packages</strong> در دسکتاپ (جست‌وجوی آزاد روی <code>apk search</code>)، یا <a href="https://pkgs.alpinelinux.org/packages">pkgs.alpinelinux.org</a>.</p>
+<p>اپ‌هایی که <strong>همین حالا</strong> در Alpine 3.21 (همان چیزی که LinPad دارد) بسته دارند:</p>
+<table>
+<thead>
+<tr>
+<th>اپ</th>
+<th>بسته</th>
+<th>اپ</th>
+<th>بسته</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GIMP</td>
+<td><code>gimp</code></td>
+<td>Inkscape</td>
+<td><code>inkscape</code></td>
+</tr>
+<tr>
+<td>LibreOffice</td>
+<td><code>libreoffice</code></td>
+<td>KeePassXC</td>
+<td><code>keepassxc</code></td>
+</tr>
+<tr>
+<td>VLC</td>
+<td><code>vlc</code></td>
+<td>Thunderbird</td>
+<td><code>thunderbird</code></td>
+</tr>
+<tr>
+<td>Firefox</td>
+<td><code>firefox-esr</code> / <code>firefox</code></td>
+<td>Chromium</td>
+<td><code>chromium</code></td>
+</tr>
+<tr>
+<td>Krita</td>
+<td><code>krita</code></td>
+<td>Blender</td>
+<td><code>blender</code></td>
+</tr>
+<tr>
+<td>Audacity</td>
+<td><code>audacity</code></td>
+<td>Zotero</td>
+<td><code>zotero</code></td>
+</tr>
+<tr>
+<td>Okular</td>
+<td><code>okular</code></td>
+<td>Evince</td>
+<td><code>evince</code></td>
+</tr>
+<tr>
+<td>Telegram Desktop</td>
+<td><code>telegram-desktop</code></td>
+<td>Wireshark</td>
+<td><code>wireshark</code></td>
+</tr>
+<tr>
+<td>Remmina</td>
+<td><code>remmina</code></td>
+<td>GParted</td>
+<td><code>gparted</code></td>
+</tr>
+<tr>
+<td>Syncthing</td>
+<td><code>syncthing</code></td>
+<td>Nextcloud</td>
+<td><code>nextcloud-client</code></td>
+</tr>
+<tr>
+<td>Geany</td>
+<td><code>geany</code></td>
+<td>Meld</td>
+<td><code>meld</code></td>
+</tr>
+<tr>
+<td>SQLite Browser</td>
+<td><code>sqlitebrowser</code></td>
+<td>Thonny</td>
+<td><code>thonny</code></td>
+</tr>
+<tr>
+<td>FileZilla</td>
+<td><code>filezilla</code></td>
+<td>Transmission</td>
+<td><code>transmission-gtk</code></td>
+</tr>
+<tr>
+<td>HexChat</td>
+<td><code>hexchat</code></td>
+<td>Pidgin</td>
+<td><code>pidgin</code></td>
+</tr>
+<tr>
+<td>Zathura</td>
+<td><code>zathura</code></td>
+<td>Thunar</td>
+<td><code>thunar</code></td>
+</tr>
+</tbody></table>
+<p><strong>این‌ها را با <code>.deb</code> نصب نکنید.</strong> حتی اگر نسخهٔ دبیانشان جدیدتر باشد، نسخهٔ Alpine با musl و کتابخانه‌های سیستم هماهنگ است و دردسر ندارد.</p>
+<p>اپ‌هایی که بستهٔ Alpine <strong>ندارند</strong> (بخش ۲٫۴ و ۲٫۵ به کار می‌آید): Obsidian، Signal، Discord، Slack، Zoom، Spotify، VSCodium، Element، OnlyOffice، Godot، Joplin، Logseq، Vivaldi، Brave.</p>
+<h3>۲.۴ سطح ۲ — نصب <code>.deb</code> با <code>linpad-get</code></h3>
+<p>این ابزار در پوشهٔ <code>personalize/</code> همین پروژه است و کارش دقیقاً همین است.</p>
+<h4>الف) آماده‌سازی (یک‌بار)</h4>
+<pre><code class="language-sh"># ابزار را داخل مهمان ببرید (curl یا Files)، بعد:
+chmod 755 /usr/local/bin/linpad-get
+linpad-get doctor          # چه چیزی هست، چه چیزی نیست
+linpad-get island          # ساخت جزیره glibc: یک‌بار، چند صد مگابایت
+</code></pre>
+<p>اگر VS Code یا Wine را قبلاً نصب کرده‌اید، جزیره از قبل هست و این گام سریع تمام می‌شود.</p>
+<h4>ب) انتخاب فایل درست</h4>
+<p>در صفحهٔ دانلود سازنده، دنبال این‌ها بگردید:</p>
+<ul>
+<li><code>..._arm64.deb</code> یا <code>..._aarch64.deb</code> ✅</li>
+<li><code>..._all.deb</code> ✅ (فقط داده/اسکریپت است)</li>
+<li><code>..._amd64.deb</code> یا <code>..._x86_64.deb</code> ❌ (روی LinPad اجرا نمی‌شود)</li>
+<li><code>..._armhf.deb</code> ❌ (۳۲ بیتی)</li>
+</ul>
+<p>اگر فقط AppImage یا tar.gz برای arm64 هست، بخش ۲٫۵.</p>
+<h4>ج) نصب</h4>
+<pre><code class="language-sh">linpad-get install ./signal-desktop_7.x_arm64.deb
+# یا از URL
+linpad-get install https://&lt;سایت سازنده&gt;/&lt;app&gt;_&lt;نسخه&gt;_arm64.deb   # آدرس واقعی را از صفحهٔ دانلود بردارید
+</code></pre>
+<p>پشت صحنه چه می‌شود:</p>
+<ol>
+<li><code>data.tar.*</code> باز می‌شود و <strong>هر فایل جداگانه</strong> در ریشه کپی می‌شود — با محافظ: فایل‌های متعلق به apk و فایل‌های جزیرهٔ glibc بازنویسی نمی‌شوند.</li>
+<li>برای هر برنامهٔ glibc در <code>/usr/bin</code> یک لانچر در <code>/usr/local/bin</code> ساخته می‌شود که <code>LD_PRELOAD</code> و <code>LD_LIBRARY_PATH</code> نشست را پاک می‌کند.</li>
+<li>اگر <code>.desktop</code> همراه بسته نباشد، یکی ساخته می‌شود.</li>
+<li>فهرست فایل‌ها ذخیره می‌شود تا <code>linpad-get remove &lt;name&gt;</code> دقیقاً همان‌ها را پاک کند.</li>
+</ol>
+<p>بعد از نصب، یک‌بار <strong>Restart Desktop Session</strong> لازم است تا آیکون ظاهر شود.</p>
+<h4>د) اولین اجرا و عیب‌یابی</h4>
+<p>همیشه اول از ترمینال اجرا کنید تا خطا را ببینید:</p>
+<pre><code class="language-sh">signal-desktop            # نام لانچر
+# یا مسیر واقعی:
+/usr/bin/signal-desktop
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>خطا</th>
+<th>معنی</th>
+<th>کار</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>error while loading shared libraries: libfoo.so.1</code></td>
+<td>کتابخانه در جزیره نیست</td>
+<td>بخش ۲٫۴٫هـ</td>
+</tr>
+<tr>
+<td><code>The SUID sandbox helper binary was found, but is not configured correctly</code></td>
+<td>اپ Electron است و sandbox می‌خواهد</td>
+<td>با <code>--no-sandbox</code> اجرا کنید (پایین)</td>
+</tr>
+<tr>
+<td><code>Failed to create wl_display</code> / <code>cannot open display</code></td>
+<td>اپ X11 است</td>
+<td>قاعدهٔ X11 (پایین)</td>
+</tr>
+<tr>
+<td><code>Settings schema &#39;…&#39; is not installed</code></td>
+<td>داده‌های اسکیمای GTK کامل نیست</td>
+<td><code>apk add glib-dev</code> سپس <code>glib-compile-schemas /usr/share/glib-2.0/schemas</code></td>
+</tr>
+<tr>
+<td><code>Gtk-WARNING: cannot open display:</code></td>
+<td>محیط Wayland به اپ نرسیده</td>
+<td>از لانچر دسکتاپ اجرا کنید، نه از SSH</td>
+</tr>
+</tbody></table>
+<p><strong>اپ‌های Electron</strong> (Signal، Slack، Discord، Element، VS Code): چون LinPad نه seccomp دارد نه user namespace، sandbox کروم کار نمی‌کند و باید خاموش شود:</p>
+<pre><code class="language-sh"># دستی
+/usr/bin/signal-desktop --no-sandbox
+# یا در لانچر: بعد از unset ها، exec را این‌طور کنید
+# exec &quot;/usr/bin/signal-desktop&quot; --no-sandbox &quot;$@&quot;
+</code></pre>
+<p>و برای اینکه Wayland را انتخاب کند:</p>
+<pre><code class="language-sh">export ELECTRON_OZONE_PLATFORM_HINT=wayland
+</code></pre>
+<p><strong>اپ‌های X11</strong> (بعضی قدیمی‌ها): باید یک قاعده در <code>/etc/ishwl/apps</code> داشته باشند تا ishwl برایشان Xwayland باز کند:</p>
+<pre><code class="language-sh">printf &#39;myapp x11\n&#39; &gt;&gt; /etc/ishwl/apps
+</code></pre>
+<p><strong>اپ‌های Qt6</strong> (KeePassXC دبیان، VLC دبیان، بعضی ابزارها): <code>.deb</code> خودش Qt را ندارد؛ باید کتابخانه‌های Qt6 دبیان هم به جزیره اضافه شوند. فهرست کوتاه (نام‌ها در trixie بررسی شده‌اند):</p>
+<pre><code>libqt6core6t64 libqt6gui6 libqt6widgets6 libqt6dbus6 libqt6network6 libqt6svg6 qt6-wayland
+</code></pre>
+<p>این‌ها را به <code>BASE_LIBS</code> در <code>linpad-get</code> اضافه کنید و <code>linpad-get island</code> را دوباره اجرا کنید. Qt6 کامل حدود ۱۵۰ مگابایت است؛ برای هر اپ Qt فقط یک‌بار.</p>
+<h4>هـ) وقتی کتابخانه کم است</h4>
+<pre><code class="language-sh"># چه چیزی کم است؟
+env -u LD_PRELOAD /lib/ld-linux-aarch64.so.1 --list /usr/bin/myapp | grep &#39;not found&#39;
+</code></pre>
+<p>بعد:</p>
+<ol>
+<li>در <a href="https://packages.debian.org/search?searchon=contents">packages.debian.org</a> نام فایل کتابخانه را جست‌وجو کنید (گزینهٔ «Search the contents of packages»، معماری arm64، توزیع trixie).</li>
+<li>نام بستهٔ دبیان را بگیرید.</li>
+<li>آن را به <code>BASE_LIBS</code> در <code>linpad-get</code> اضافه کنید.</li>
+<li><code>linpad-get island</code> را دوباره اجرا کنید.</li>
+</ol>
+<p>این کار «حل خودکار وابستگی» نیست، ولی برای اپ‌های معمولی GTK بعد از یکی دو بار تنظیم، تمام می‌شود.</p>
+<h4>و) حذف</h4>
+<pre><code class="language-sh">linpad-get list
+linpad-get remove signal-desktop
+</code></pre>
+<h3>۲٫۵ سطح ۳ — AppImage و tarball</h3>
+<p>اگر سازنده فقط AppImage یا tar می‌دهد:</p>
+<pre><code class="language-sh">linpad-get install ./MyApp-1.2-arm64.AppImage
+# یا
+linpad-get install ./postman.tar.gz
+</code></pre>
+<p>AppImage به‌جای FUSE باز (extract) می‌شود و در <code>/opt/linpad-get/&lt;name&gt;</code> می‌نشیند؛ tarball هم همین‌طور. هر دو لانچر و آیکون می‌گیرند.</p>
+<p>اگر AppImage خودش اجرا نشد:</p>
+<pre><code class="language-sh">./App.AppImage --appimage-extract
+./squashfs-root/AppRun
+</code></pre>
+<h3>۲٫۶ سطح ۴ — chroot دبیان: ممکن است، ولی توصیه نمی‌شود</h3>
+<p>ایدهٔ وسوسه‌انگیز: یک rootfs دبیان بسازیم، <code>chroot</code> کنیم و با <code>apt</code> هر بسته‌ای نصب کنیم. سه واقعیت دربارهٔ LinPad:</p>
+<p>۱. <strong><code>chroot</code> کار می‌کند.</strong> <code>sys_chroot</code> در <code>kernel/fs.c:884</code> پیاده شده و چون ترمینال LinPad با root اجرا می‌شود، محدودیتی ندارد.
+۲. <strong><code>mount</code> هم تا حدی کار می‌کند.</strong> <code>fs/mount.c:178</code> فقط چهار فایل‌سیستم را می‌شناسد: <code>realfs</code>، <code>procfs</code>، <code>devpts</code> و <code>tmpfs</code>. یعنی <code>mount -t proc proc /mnt/proc</code> و <code>mount -t devpts</code> جواب می‌دهند.
+۳. <strong>ولی <code>bind mount</code> پشتیبانی نمی‌شود.</strong> پرچم <code>MS_BIND</code> در <code>MS_SUPPORTED</code> نیست (<code>fs/mount.c:175</code>) و با <code>EINVAL</code> برمی‌گردد. این همان چیزی است که chroot را برای کار GUI بی‌فایده می‌کند: نمی‌توانید <code>/dev</code>، <code>/sys</code> و — مهم‌تر از همه — پوشهٔ سوکت Wayland (<code>/tmp/xdg-runtime</code>) را داخل chroot شریک کنید. بدون آن، هیچ اپ گرافیکی داخل chroot به کامپوزیتور نمی‌رسد.</p>
+<p>وضعیت <code>proot</code> هم بد نیست بدانید: در Alpine 3.21 (همان تصویر LinPad) بستهٔ <code>proot</code> <strong>وجود ندارد</strong> (در 3.24 اضافه شده)، ولی <code>debootstrap</code> و <code>dpkg</code> و <code>jchroot</code> در 3.21 هستند. پس یک chroot «دستی» ساختنی است — فقط برای کارهای خط فرمان.</p>
+<p><strong>نتیجه:</strong> برای اپ‌های GUI، مسیر استخراج <code>.deb</code> (سطح ۲) هم سریع‌تر است، هم سبک‌تر، هم با دسکتاپ یکپارچه. chroot را برای کارهای خاص (ساختن بسته، تست CLI) نگه دارید، نه برای نصب اپ روزمره.</p>
+<h3>۲٫۷ چه چیزی هیچ‌وقت کار نمی‌کند</h3>
+<table>
+<thead>
+<tr>
+<th>مورد</th>
+<th>چرا</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>flatpak install</code></td>
+<td>به user namespace و bubblewrap نیاز دارد؛ <code>CLONE_NEWUSER</code> در <code>kernel/fork.c</code> با <code>EINVAL</code> رد می‌شود</td>
+</tr>
+<tr>
+<td><code>snap install</code></td>
+<td>snapd به systemd نیاز دارد</td>
+</tr>
+<tr>
+<td>Docker / Podman</td>
+<td>namespace، cgroup، overlayfs</td>
+</tr>
+<tr>
+<td>باینری x86_64 لینوکسی</td>
+<td><code>kernel/elf.h</code> فقط <code>EM_AARCH64</code> را می‌پذیرد</td>
+</tr>
+<tr>
+<td>AppImage نوع ۲ بدون extract</td>
+<td>FUSE نیست (ولی extract کار می‌کند)</td>
+</tr>
+<tr>
+<td>اپ‌های WebKitGTK</td>
+<td>لایهٔ سوکت شبیه‌ساز پشتیبانی نمی‌کند</td>
+</tr>
+<tr>
+<td>درایور کرنل / USB / چاپگر</td>
+<td>شبیه‌ساز کرنل واقعی نیست</td>
+</tr>
+<tr>
+<td>سرویس‌های systemd</td>
+<td>init وجود ندارد</td>
+</tr>
+</tbody></table>
+<h3>۲٫۸ جدول شانس موفقیت اپ‌های معروف</h3>
+<table>
+<thead>
+<tr>
+<th>اپ</th>
+<th>بهترین مسیر</th>
+<th>شانس</th>
+<th>یادداشت</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>VS Code</td>
+<td>پک <code>vscode</code> در استور</td>
+<td>✅ تأییدشده</td>
+<td>خود پروژه نصبش می‌کند</td>
+</tr>
+<tr>
+<td>Signal</td>
+<td><code>.deb</code> arm64 + <code>--no-sandbox</code></td>
+<td>🟡 محتمل</td>
+<td>Electron، سنگین؛ سازنده نسخهٔ arm64 می‌دهد</td>
+</tr>
+<tr>
+<td>Slack</td>
+<td><code>.deb</code> arm64 + <code>--no-sandbox</code></td>
+<td>🟡 محتمل</td>
+<td>Electron، حافظه‌بر</td>
+</tr>
+<tr>
+<td>Element</td>
+<td><code>.deb</code> arm64 + <code>--no-sandbox</code></td>
+<td>🟡 محتمل</td>
+<td>Electron</td>
+</tr>
+<tr>
+<td>VSCodium</td>
+<td><code>.deb</code> arm64 یا AppImage</td>
+<td>🟡 محتمل</td>
+<td>همان Chromium، بدون تلمتری</td>
+</tr>
+<tr>
+<td>Discord</td>
+<td><code>.deb</code> — معمولاً فقط amd64</td>
+<td>❌/🟡</td>
+<td>قبل از دانلود نام فایل را چک کنید</td>
+</tr>
+<tr>
+<td>Obsidian</td>
+<td>نسخهٔ arm64 رسمی معمولاً نیست</td>
+<td>❌</td>
+<td>فقط x86_64 منتشر می‌شود؛ buildهای اجتماعی arm64 وجود دارد</td>
+</tr>
+<tr>
+<td>Spotify</td>
+<td><code>.deb</code> — معمولاً فقط amd64</td>
+<td>❌</td>
+<td>Widevine هم مسئله است</td>
+</tr>
+<tr>
+<td>KeePassXC</td>
+<td><code>apk add keepassxc</code></td>
+<td>✅</td>
+<td>نسخهٔ Alpine موجود است</td>
+</tr>
+<tr>
+<td>LibreOffice</td>
+<td><code>apk add libreoffice</code> یا پک استور</td>
+<td>✅/🟡</td>
+<td>پک استور آزمایشی است</td>
+</tr>
+<tr>
+<td>GIMP</td>
+<td><code>apk add gimp</code> + قاعدهٔ X11</td>
+<td>✅ تأییدشده</td>
+<td>پروژه تست کرده</td>
+</tr>
+<tr>
+<td>Telegram Desktop</td>
+<td><code>apk add telegram-desktop</code></td>
+<td>🟡</td>
+<td>Qt6؛ در استور نیست، دستی نصب کنید</td>
+</tr>
+<tr>
+<td>Zoom</td>
+<td>—</td>
+<td>❌</td>
+<td>نسخهٔ لینوکسی arm64 عمومی ندارد</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>—</td>
+<td>❌</td>
+<td>namespace ندارد</td>
+</tr>
+<tr>
+<td>Steam</td>
+<td>—</td>
+<td>❌</td>
+<td>x86_64 + گرافیک</td>
+</tr>
+</tbody></table>
+<p>🟡 = نصب‌شدنی است، ولی باید تست شود؛ ✅ = تأییدشده توسط پروژه یا بستهٔ بومی دارد.</p>
+<h3>۲٫۹ چک‌لیست تست یک اپ جدید</h3>
+<pre><code class="language-sh"># ۱. نصب
+linpad-get install ./app_arm64.deb
+
+# ۲. اجرا از ترمینال (خطا را ببینید)
+app-name
+
+# ۳. اگر کتابخانه کم بود
+env -u LD_PRELOAD /lib/ld-linux-aarch64.so.1 --list /usr/bin/app-name | grep &#39;not found&#39;
+
+# ۴. اگر Electron بود
+app-name --no-sandbox
+
+# ۵. بعد از موفقیت: Restart Desktop Session و اجرا از آیکون
+</code></pre>
+<hr>
+<h2>بخش ۳ — دستورهای کپی-پیست</h2>
+<pre><code class="language-sh"># --- آماده‌سازی مهمان ---
+linpad-get doctor
+linpad-get island
+
+# --- بستهٔ بومی (همیشه اول این) ---
+apk search -v &lt;name&gt; &amp;&amp; apk add &lt;name&gt;
+
+# --- .deb ---
+linpad-get install ./&lt;file&gt;_arm64.deb
+
+# --- AppImage / tar ---
+linpad-get install ./&lt;file&gt;.AppImage
+linpad-get install ./&lt;file&gt;.tar.gz
+
+# --- Electron ---
+/usr/bin/&lt;app&gt; --no-sandbox
+
+# --- X11 ---
+printf &#39;&lt;app&gt; x11\n&#39; &gt;&gt; /etc/ishwl/apps
+
+# --- عیب‌یابی کتابخانه ---
+env -u LD_PRELOAD /lib/ld-linux-aarch64.so.1 --list /usr/bin/&lt;app&gt; | grep &#39;not found&#39;
+
+# --- حذف ---
+linpad-get list
+linpad-get remove &lt;name&gt;
+</code></pre>
+<hr>
+<h2>بخش ۴ — ریسک‌ها</h2>
+<table>
+<thead>
+<tr>
+<th>ریسک</th>
+<th>شدت</th>
+<th>کاهش</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>گواهی ۷ روزه و soft-ban اپل</td>
+<td>بالا (عملیاتی)</td>
+<td>SideStore برای refresh، یا حساب پولی</td>
+</tr>
+<tr>
+<td>iloader روی iPadOS 27.2 پشتیبانی رسمی ندارد</td>
+<td>متوسط</td>
+<td>بخش ۱٫۶</td>
+</tr>
+<tr>
+<td>نصب <code>.deb</code> فایل سیستمی را عوض کند</td>
+<td>متوسط</td>
+<td>محافظ <code>apk info -W</code> در <code>linpad-get</code>؛ backup قبل از هر چیز</td>
+</tr>
+<tr>
+<td>اپ Electron حافظه را پر کند</td>
+<td>متوسط</td>
+<td>Performance overlay، <code>Close apps when memory runs out</code></td>
+</tr>
+<tr>
+<td>Alpine 3.21 منقضی</td>
+<td>بالا</td>
+<td>مهاجرت به 3.24 (گزارش قبلی، بخش ۳٫۳)</td>
+</tr>
+<tr>
+<td>حذف اپ با uninstall کردن LinPad</td>
+<td>بالا</td>
+<td>دادهٔ لینوکس با uninstall از بین می‌رود؛ backup بگیرید</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>بخش ۵ — منابع</h2>
+<ul>
+<li><a href="https://iloader.site/">iloader — سایت رسمی</a> · <a href="https://iloader.site/guides/install-ipa-iphone/">راهنمای نصب IPA</a> · <a href="https://iloader.site/faq/">FAQ</a> · <a href="https://github.com/nab138/iloader">GitHub</a></li>
+<li><a href="https://github.com/fspecii/LinPad/releases/tag/v1.5.0">LinPad v1.5.0 release</a> · <a href="https://github.com/fspecii/LinPad/releases/download/v1.5.0/LinPad-1.5.0.ipa">فایل IPA</a></li>
+<li><a href="https://github.com/StikDebug/StikDebug">StikDebug</a> · <a href="https://docs.sidestore.io">SideStore docs</a></li>
+<li><a href="https://pkgs.alpinelinux.org/packages">Alpine packages</a> · <a href="https://packages.debian.org/search?searchon=contents">Debian package search</a></li>
+<li>داخل مخزن: <code>personalize/linpad-get</code>، <code>devtools/install-vscode.sh</code>، <code>devtools/debfetch.mjs</code>، <code>kernel/elf.h</code>، <code>kernel/fork.c</code>، <code>release/INSTALL-DEVICE.md</code></li>
+</ul>
+
+</body>
+</html>

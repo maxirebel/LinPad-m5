@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(APP_DISPLAY_NAME)</string>
+	<key>CFBundleDisplayName</key>
+	<string>$(APP_DISPLAY_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).links</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>linpad</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>stikdebug</string>
+		<string>sidestore</string>
+		<string>altstore</string>
+		<string>localdevvpn</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Show and edit the events from your iPad's calendars in the desktop's Calendar, clock and widgets.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Show and edit the events from your iPad's calendars in the desktop's Calendar, clock and widgets.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This is required for connecting to localhost and using the ping command.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Programs running in iSH will be allowed to track your location in the background.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Programs running in iSH will be allowed to track your location in the background.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>With Settings › Background set to “Always”, location updates keep Linux running while LinPad is in the background; LinPad does not keep or share where you are. Linux programs that read /dev/location can also see your location.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>app.ish.scene</string>
+	</array>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>Main App</string>
+					<key>UISceneDelegateClassName</key>
+					<string>SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Terminal</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>location</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Linux apps you run can use the camera, for example for video calls or to take pictures. The camera is only on while an app captures.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Linux apps you run can record from the microphone, for example for calls or voice notes, and screen recordings can include your voice when you turn the microphone on. The microphone is only on while an app records.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save wallpapers, images and videos from Linux apps to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Browse your photos in Files and open them in Linux apps.</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Terminal</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Linux files</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.valentinneagu.ish.guest-items</string>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Desktop launcher</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.valentinneagu.ish.desktop-launcher</string>
+		</dict>
+	</array>
+	<key>fuc</key>
+	<string>ICON_STUFF</string>
+</dict>
+</plist>
