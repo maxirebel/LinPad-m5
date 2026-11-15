@@ -59,6 +59,8 @@ final class ShelfModel {
     private(set) var installLabel = ""
     private(set) var log = ""
     private(set) var errorMessage: String?
+    /// What SetupService did on this launch ("tools installed", "already up to date", ...).
+    private(set) var setupNote = ""
     private(set) var lastInstalled: String?
 
     /// The link field. Accepts an https .deb, a guest path, or a Debian package name.
@@ -73,6 +75,12 @@ final class ShelfModel {
     func start() async {
         guard !didStart else { return }
         didStart = true
+        // A fresh install has no linpad-shelf in the guest yet; the app carries it.
+        switch await SetupService.ensureInstalled(on: host) {
+        case .installed: setupNote = "Guest tools installed"
+        case .upToDate: setupNote = "Guest tools up to date"
+        case .failed(let why): setupNote = "Setup failed: \(why)"
+        }
         await reload()
     }
 
@@ -113,6 +121,28 @@ final class ShelfModel {
             await reload()
         } else {
             errorMessage = "Install failed (exit \(code)). The log below says which step."
+            isLogVisible = true
+        }
+    }
+
+    /// Firefox is the one app worth a dedicated button: it replaces the stock ESR 128.
+    var hasFirefox: Bool { entries.contains { $0.name == "firefox-esr" } }
+
+    func installFirefox() async {
+        guard !isInstalling else { return }
+        errorMessage = nil
+        isInstalling = true
+        installLabel = "Installing Firefox 153"
+        log = ""
+        let code = await SetupService.installFirefox(on: host) { [weak self] chunk in
+            self?.append(chunk)
+        }
+        isInstalling = false
+        installLabel = ""
+        if code == 0 {
+            await reload()
+        } else {
+            errorMessage = "Firefox install failed (exit \(code)). The log below says why."
             isLogVisible = true
         }
     }
@@ -181,6 +211,13 @@ struct ShelfAppView: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 toolbar
+                if !model.setupNote.isEmpty {
+                    Text(model.setupNote)
+                        .font(.caption2)
+                        .foregroundStyle(theme.secondaryText)
+                        .padding(.horizontal, 14)
+                        .padding(.bottom, 4)
+                }
                 if let message = model.errorMessage {
                     InlineBanner(kind: .error, message: message, onDismiss: { model.dismissError() })
                 }
@@ -257,6 +294,7 @@ struct ShelfAppView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 installCard
+                firefoxCard
                 if model.entries.isEmpty {
                     emptyState
                 } else {
@@ -307,6 +345,36 @@ struct ShelfAppView: View {
         }
         .padding(12)
         .background(theme.panelBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    /// One dedicated button for the app everybody wants first: current Firefox.
+    @ViewBuilder private var firefoxCard: some View {
+        if !model.hasFirefox {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: "flame.fill").foregroundStyle(.orange)
+                    Text("Firefox 153").font(.subheadline.weight(.semibold))
+                    Spacer()
+                }
+                Text("Replaces the stock Firefox ESR 128, which no longer gets security updates, with Debian's current build and a fresh tuned profile.")
+                    .font(.caption)
+                    .foregroundStyle(theme.secondaryText)
+                Button {
+                    Task { await model.installFirefox() }
+                } label: {
+                    if model.isInstalling {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Text("Install Firefox 153")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(theme.accent)
+                .disabled(model.isInstalling)
+            }
+            .padding(12)
+            .background(theme.panelBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
     }
 
     private var emptyState: some View {
