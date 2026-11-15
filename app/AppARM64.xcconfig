@@ -24,4 +24,4 @@ SWIFT_VERSION = 5.0
 SWIFT_OBJC_BRIDGING_HEADER = app/iSH-ARM64-Bridging-Header.h
 
 // LinPad releases are versioned independently of upstream iSH (release/RELEASING.md).
-MARKETING_VERSION = 1.4.0
+MARKETING_VERSION = 1.5.1
