@@ -22,7 +22,7 @@ on:
       rootfs_sha256:
         description: SHA-256 of that tarball (empty to skip the check)
         required: false
-        default: b5e852cfe2d9763863323895a6f94194ac980b226926a6f6a2a27c5f5e41ea9b
+        default: b5e852cfe2d9763863323895a6f94194ac980b226926a6f6aba27c5f5e41ea9b
       rootfs_version:
         description: Value written to root.version inside the app
         required: false
@@ -116,7 +116,7 @@ jobs:
       - name: Fetch the rootfs that goes inside the app
         env:
           ROOTFS_URL: ${{ github.event.inputs.rootfs_url || 'https://github.com/fspecii/LinPad/releases/download/v1.5.0/linpad-rootfs-1.5.0.tar.gz' }}
-          ROOTFS_SHA: ${{ github.event.inputs.rootfs_sha256 || 'b5e852cfe2d9763863323895a6f94194ac980b226926a6f6a2a27c5f5e41ea9b' }}
+          ROOTFS_SHA: ${{ github.event.inputs.rootfs_sha256 || 'b5e852cfe2d9763863323895a6f94194ac980b226926a6f6aba27c5f5e41ea9b' }}
         run: |
           mkdir -p release/out
           if [ ! -s release/out/rootfs.tar.gz ]; then
