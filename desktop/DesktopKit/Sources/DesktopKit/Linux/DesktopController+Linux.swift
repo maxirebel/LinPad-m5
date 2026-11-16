@@ -92,6 +92,13 @@ extension DesktopController: LinuxGUIBridgeDelegate {
         return featured + entries
     }
 
+    /// Called after an app is installed or removed, so the launcher and the app list
+    /// stop serving the copy they read at session start.
+    func reloadLinuxApplications() {
+        guard let linux else { return }
+        Task { await linux.loadApplications() }
+    }
+
     func openLinuxApp(_ appID: String, arguments: [String: String] = [:]) {
         if appID == LinuxAppID.preferredTerminal {
             openPreferredTerminal(at: arguments[AppArgument.cwd])

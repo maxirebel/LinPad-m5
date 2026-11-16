@@ -118,6 +118,9 @@ final class ShelfModel {
         if code == 0 {
             link = ""
             lastInstalled = device
+            // The desktop reads .desktop files once per session; without this the app
+            // would only appear in Applications after a restart.
+            desktop.reloadLinuxApplications()
             await reload()
         } else {
             errorMessage = "Install failed (exit \(code)). The log below says which step."
@@ -140,6 +143,7 @@ final class ShelfModel {
         isInstalling = false
         installLabel = ""
         if code == 0 {
+            desktop.reloadLinuxApplications()
             await reload()
         } else {
             errorMessage = "Firefox install failed (exit \(code)). The log below says why."
@@ -161,6 +165,7 @@ final class ShelfModel {
         isInstalling = false
         installLabel = ""
         if code == 0 {
+            desktop.reloadLinuxApplications()
             await reload()
         } else {
             errorMessage = "Remove failed (exit \(code))."

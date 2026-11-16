@@ -465,4 +465,8 @@ private final class DesktopActionsProxy: DesktopActions {
     func notify(_ message: String) {
         controller?.notify(message)
     }
+
+    func reloadLinuxApplications() {
+        controller?.reloadLinuxApplications()
+    }
 }

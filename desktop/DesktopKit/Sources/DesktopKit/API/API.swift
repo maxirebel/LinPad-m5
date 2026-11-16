@@ -219,6 +219,15 @@ public extension WindowHandle {
 public protocol DesktopActions: AnyObject {
     func open(appID: String, arguments: [String: String])
     func notify(_ message: String)
+
+    /// Re-reads the guest's `.desktop` files, so an app installed a moment ago can be
+    /// opened without restarting the session. The desktop already does this for the
+    /// store; this lets any installer do the same.
+    func reloadLinuxApplications()
+}
+
+public extension DesktopActions {
+    func reloadLinuxApplications() {}
 }
 
 public struct AppLaunchContext {
