@@ -174,6 +174,7 @@ struct SettingsAppView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 22) {
                             if let fastMode { FastModeSettingsSection(fastMode: fastMode) }
+                PerformanceProfileSection()
                             appearanceSection
                             StoreSettingsSection(store: StoreModel.shared(for: host), desktop: desktop)
                                 .id(SettingsApp.appsPage)
@@ -562,6 +563,49 @@ struct SettingsAppView: View {
     }
 }
 
+/// Three named bundles of settings that already exist (Core/System/PerformanceProfile.swift).
+private struct PerformanceProfileSection: View {
+    @AppStorage(PerformanceProfile.storageKey) private var profileRaw = PerformanceProfile.defaultProfile.rawValue
+    @Environment(\.desktopTheme) private var theme
+
+    private var profile: PerformanceProfile { PerformanceProfile(rawValue: profileRaw) ?? .balanced }
+
+    var body: some View {
+        WithPerceptionTracking {
+            SettingsSection(title: "Performance profile", symbol: "speedometer") {
+                SettingsRow(title: "Profile") {
+                    Picker("Profile", selection: Binding(
+                        get: { profile },
+                        set: { chosen in
+                            chosen.apply()
+                            profileRaw = chosen.rawValue
+                        }
+                    )) {
+                        ForEach(PerformanceProfile.allCases) { option in
+                            Text(option.title).tag(option)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .fixedSize()
+                    .accessibilityIdentifier("settings.performanceProfile")
+                }
+                SettingsRow(title: "What it does") {
+                    Text(profile.summary)
+                        .font(.callout)
+                        .foregroundStyle(theme.secondaryText)
+                        .multilineTextAlignment(.trailing)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("settings.performanceProfileSummary")
+                }
+                if profile.requiresRelaunch {
+                    Text("The code cache is read when the JIT starts: quit and reopen LinPad to apply it.")
+                        .font(.caption)
+                        .foregroundStyle(theme.secondaryText)
+                }
+            }
+        }
+    }
+}
 /// Fast mode: the setting, what happened at this launch, a retry and the setup steps.
 private struct FastModeSettingsSection: View {
     @Perception.Bindable var fastMode: FastModeModel
